@@ -7,17 +7,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.shermanrex.weatherapp.jetpack.weatherapp.screen.MainApp
 import com.shermanrex.weatherapp.jetpack.weatherapp.screen.SearchCityScreen
-import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.SearchCityApiViewModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.MyviewModel
 
 @Composable
-fun MyNavController(NavController:NavHostController , searchCityApiViewModel: SearchCityApiViewModel){
+fun MyNavController(NavController:NavHostController , myviewModel: MyviewModel){
     NavHost(navController = NavController , startDestination = NavControllerModel.MainApp.Route ){
         composable(NavControllerModel.MainApp.Route){
             MainApp(NavController)
         }
         composable(NavControllerModel.SearchCityScreen.Route){
-            SearchCityScreen(NavController,searchCityApiViewModel , Click = {
-                Log.d("TAG" , "MyNavController: " + it)
+            SearchCityScreen(NavController,myviewModel , Click = {
+
             })
         }
     }

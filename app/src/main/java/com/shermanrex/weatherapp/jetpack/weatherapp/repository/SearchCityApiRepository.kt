@@ -1,8 +1,8 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.repository
 
 import android.util.Log
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResult
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.SearchCityApiModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.retrofit.retrofitService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,24 +15,24 @@ import javax.inject.Named
 
 class SearchCityApiRepository @Inject constructor(@Named("SearchApiRetrofit") var retrofit: Retrofit) {
 
-    var _resultStateFlow = MutableStateFlow<ResponseResult>(ResponseResult.Empty)
-    var resultStateFlow:StateFlow<ResponseResult> = _resultStateFlow
+    var _resultStateFlow =
+        MutableStateFlow<ResponseResultModel>(ResponseResultModel.Idle)
+    var resultStateFlow: StateFlow<ResponseResultModel> = _resultStateFlow
 
-    fun getSearchCityApiRepo(cityname:String){
-        _resultStateFlow.value = ResponseResult.Loading
+    fun getSearchCityApiRepo(cityname: String) {
+        _resultStateFlow.value = ResponseResultModel.Loading
         retrofit.create(retrofitService::class.java).getSearchApi(
             cityName = cityname
-        ).enqueue(object :Callback<SearchCityApiModel>{
+        ).enqueue(object : Callback<SearchCityApiModel> {
             override fun onResponse(
                 call: Call<SearchCityApiModel> ,
                 response: Response<SearchCityApiModel>
             ) {
-                if (response.body()!!.isEmpty()){
-                    _resultStateFlow.value = ResponseResult.Error("Nothing Found! Please try again")
+                if (response.body().toString().isEmpty()) {
+                    _resultStateFlow.value = ResponseResultModel.Error("Nothing Found! Please try again")
 
-                }else if (response.isSuccessful){
-                    _resultStateFlow.value = ResponseResult.SearchSuccess(response.body() as SearchCityApiModel)
-
+                } else if (response.isSuccessful) {
+                    _resultStateFlow.value = ResponseResultModel.Success(response.body() as SearchCityApiModel)
                 }
 
             }

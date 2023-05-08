@@ -1,12 +1,24 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.screen
 
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +32,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -32,6 +45,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -47,15 +64,32 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.shermanrex.weatherapp.jetpack.weatherapp.R
+import com.shermanrex.weatherapp.jetpack.weatherapp.sceenComponent.CollapseTopBar
 import com.shermanrex.weatherapp.jetpack.weatherapp.sceenComponent.TopAppBar
 import com.shermanrex.weatherapp.jetpack.weatherapp.ui.theme.WeatherAppTheme
-import kotlin.random.Random
+import kotlin.math.exp
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class , ExperimentalAnimationApi::class)
 @Composable
 fun MainApp(navController: NavController) {
+
+    val listState = rememberLazyListState()
+
+    val iscollapse: Boolean by remember {
+        derivedStateOf { listState.firstVisibleItemIndex > 0 }
+    }
+
     Scaffold(
-        topBar = { TopAppBar(navController) } ,
+        topBar = {
+            AnimatedVisibility(
+                visible = iscollapse
+            ) {
+                CollapseTopBar()
+            }
+            AnimatedVisibility(visible = !iscollapse) {
+                TopAppBar(navController = navController)
+            }
+        } ,
         modifier = Modifier.fillMaxSize()
     ) {
         Box(
@@ -75,7 +109,8 @@ fun MainApp(navController: NavController) {
                 Modifier
                     .fillMaxWidth() ,
                 verticalArrangement = Arrangement.Center ,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally ,
+                state = listState
             ) {
                 item {
                     CurrentWeather()
@@ -96,7 +131,7 @@ fun MainApp(navController: NavController) {
 
 @Composable
 private fun CurrentWeather() {
-    Box {
+    Box(Modifier.padding(bottom = 15.dp , top = 10.dp)) {
         Column(
             verticalArrangement = Arrangement.Center ,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -115,7 +150,7 @@ private fun CurrentWeather() {
             Text(text = buildAnnotatedString {
                 withStyle(
                     SpanStyle(
-                        fontSize = 44.sp ,
+                        fontSize = 48.sp ,
                         fontWeight = FontWeight.SemiBold ,
 
                         color = MaterialTheme.colorScheme.onPrimary
@@ -151,20 +186,9 @@ private fun CurrentWeather() {
                             color = MaterialTheme.colorScheme.onPrimary
                         ) ,
                         block = {
-                            append("20")
+                            append("20" + "°")
                         }
                     )
-                    withStyle(
-                        SpanStyle(
-                            fontWeight = FontWeight.Light ,
-                            fontSize = 12.sp ,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        ) ,
-                        block = {
-                            append(" \u2103")
-                        }
-                    )
-
                 })
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
@@ -179,20 +203,9 @@ private fun CurrentWeather() {
                             color = MaterialTheme.colorScheme.onPrimary
                         ) ,
                         block = {
-                            append("20")
+                            append("20" + "°")
                         }
                     )
-                    withStyle(
-                        SpanStyle(
-                            fontWeight = FontWeight.Light ,
-                            fontSize = 12.sp ,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        ) ,
-                        block = {
-                            append(" \u2103")
-                        }
-                    )
-
                 })
             }
         }
@@ -208,7 +221,7 @@ private fun SevenDayForecast() {
         )
     ) {
         Text(
-            text = "7 Day Forecast" ,
+            text = "7-day forecast" ,
             Modifier.padding(top = 10.dp , bottom = 4.dp , start = 10.dp , end = 10.dp) ,
             color = MaterialTheme.colorScheme.onPrimary
 
@@ -279,20 +292,9 @@ private fun SevenDayForeCastListItem() {
                         color = MaterialTheme.colorScheme.onPrimary ,
                     ) ,
                     block = {
-                        append("20")
+                        append("20" + "°")
                     }
                 )
-                withStyle(
-                    SpanStyle(
-                        fontWeight = FontWeight.Light ,
-                        color = MaterialTheme.colorScheme.onPrimary ,
-                        fontSize = 12.sp
-                    ) ,
-                    block = {
-                        append(" \u2103")
-                    }
-                )
-
             })
         }
 
@@ -320,7 +322,7 @@ private fun SevenDayForeCastListItem() {
                     fontSize = 12.sp
                 )
 
-                Spacer(modifier = Modifier.width(15.dp))
+                Spacer(modifier = Modifier.width(5.dp))
 
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown ,
@@ -422,15 +424,15 @@ fun ThreehourForccastList() {
             color = MaterialTheme.colorScheme.onPrimary
         )
         Text(
-            text = "3" ,
+            text = "3" + "°" ,
             fontSize = 12.sp ,
             fontWeight = FontWeight.Light ,
             color = MaterialTheme.colorScheme.onPrimary
         )
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground) ,
-            contentDescription = "",
-            Modifier.size(40.dp)
+            painter = painterResource(id = R.drawable.sun) ,
+            contentDescription = "" ,
+            Modifier.size(25.dp)
         )
         Text(
             text = "20" ,

@@ -1,15 +1,13 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.screen
 
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,7 +16,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,32 +42,39 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResult
-import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.SearchCityApiViewModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.SearchCityApiModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.sceenComponent.LottieLoader
+import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.MyviewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @OptIn(ExperimentalMaterial3Api::class , FlowPreview::class)
 @Composable
 fun SearchCityScreen(
     navController: NavController ,
-    searchCityApiViewModel: SearchCityApiViewModel ,
+    myviewModel: MyviewModel ,
     Click: (Int) -> Unit
 ) {
 
-    val stateSearchCityApi = searchCityApiViewModel.searchCityApiResponse().collectAsState().value
+    val stateSearchCityApi = myviewModel.searchCityApiResponse().collectAsState().value
 
     var textFieldChangeValue by remember {
         mutableStateOf("")
     }
 
+    var isplayingLottie by remember {
+        mutableStateOf(false)
+    }
+
     LaunchedEffect(key1 = textFieldChangeValue , block = {
         snapshotFlow {
             textFieldChangeValue
-        }.debounce(1500L).collectLatest {
+        }.debounce(1500L).distinctUntilChanged().collectLatest {
             if (it.length >= 2) {
-                searchCityApiViewModel.callSearchCityApi(it)
+                myviewModel.callSearchCityApi(it)
             }
         }
     })
@@ -130,11 +134,11 @@ fun SearchCityScreen(
                             .padding(15.dp , 0.dp , 15.dp , 0.dp)
                     )
                 } ,
-                shape = RoundedCornerShape(0.dp),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                shape = RoundedCornerShape(0.dp) ,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search) ,
                 keyboardActions = KeyboardActions(
                     onSearch = {
-                        searchCityApiViewModel.callSearchCityApi(textFieldChangeValue)
+                        myviewModel.callSearchCityApi(textFieldChangeValue)
                     }
                 )
             )
@@ -145,13 +149,19 @@ fun SearchCityScreen(
             Modifier
                 .padding(it)
                 .fillMaxWidth() ,
-            verticalArrangement = Arrangement.Center ,
+            verticalArrangement = Arrangement.Top ,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            AnimatedVisibility(visible = isplayingLottie) {
+               LottieLoader()
+            }
+
             when (stateSearchCityApi) {
-                is ResponseResult.SearchSuccess -> {
+                is ResponseResultModel.Success -> {
+                    isplayingLottie = false
                     LazyColumn {
-                        itemsIndexed(stateSearchCityApi.data) { index , item ->
+                        itemsIndexed(stateSearchCityApi.data as SearchCityApiModel) { index , item ->
                             ListItem(
                                 headlineText = {
                                     Text(
@@ -168,23 +178,11 @@ fun SearchCityScreen(
                     }
                 }
 
-                is ResponseResult.Loading -> {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.Magenta)
-                            .align(Alignment.CenterHorizontally) ,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        CircularProgressIndicator(
-                            strokeWidth = 5.dp
-                        )
-                        Spacer(modifier = Modifier.width(20.dp))
-                        Text(text = "Please Wait")
-                    }
+                is ResponseResultModel.Loading -> {
+                    isplayingLottie = true
                 }
 
-                is ResponseResult.Error -> {
+                is ResponseResultModel.Error -> {
                     LazyColumn {
                         item {
                             ListItem(
