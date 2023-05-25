@@ -17,8 +17,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             WeatherAppTheme {
                 val myviewModel = viewModels<MyviewModel>()
+                myviewModel.value.callWeatherRepository(0.0,0.0 , "")
                 val navController = rememberNavController()
-                MyNavController(NavController = navController , myviewModel = myviewModel.value )
+                MyNavController(NavController = navController , myviewModel = myviewModel.value)
             }
         }
     }

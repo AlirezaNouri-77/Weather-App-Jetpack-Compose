@@ -3,7 +3,7 @@ package com.shermanrex.weatherapp.jetpack.weatherapp.repository
 import android.util.Log
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.SearchCityApiModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
-import com.shermanrex.weatherapp.jetpack.weatherapp.retrofit.retrofitService
+import com.shermanrex.weatherapp.jetpack.weatherapp.retrofit.RetrofitService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import retrofit2.Call
@@ -21,7 +21,7 @@ class SearchCityApiRepository @Inject constructor(@Named("SearchApiRetrofit") va
 
     fun getSearchCityApiRepo(cityname: String) {
         _resultStateFlow.value = ResponseResultModel.Loading
-        retrofit.create(retrofitService::class.java).getSearchApi(
+        retrofit.create(RetrofitService::class.java).getSearchApi(
             cityName = cityname
         ).enqueue(object : Callback<SearchCityApiModel> {
             override fun onResponse(
@@ -32,7 +32,7 @@ class SearchCityApiRepository @Inject constructor(@Named("SearchApiRetrofit") va
                     _resultStateFlow.value = ResponseResultModel.Error("Nothing Found! Please try again")
 
                 } else if (response.isSuccessful) {
-                    _resultStateFlow.value = ResponseResultModel.Success(response.body() as SearchCityApiModel)
+                    _resultStateFlow.value = ResponseResultModel.SearchSuccess(response.body() as SearchCityApiModel)
                 }
 
             }

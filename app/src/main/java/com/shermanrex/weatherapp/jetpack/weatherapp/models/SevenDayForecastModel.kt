@@ -30,7 +30,7 @@ data class ForecastData(
     val moonset_ts: Int,
     val ozone: Double,
     val pop: Int,
-    val precip: Int,
+    val precip: Double,
     val pres: Double,
     val rh: Int,
     val slp: Double,

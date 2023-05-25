@@ -1,53 +1,56 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.models
 
 data class CurrentWeatherModel(
-    val count: Int,
-    val `data`: List<Data>
+    val base: String,
+    val clouds: CurrentClouds,
+    val cod: Int,
+    val coord: CurrentCoord,
+    val dt: Int,
+    val id: Int,
+    val main: CurrentMain,
+    val name: String,
+    val sys: CurrentSys,
+    val timezone: Int,
+    val visibility: Int,
+    val weather: List<CurrentWeather>,
+    val wind: CurrentWind
 )
 
-data class Data(
-    val app_temp: Double ,
-    val aqi: Int ,
-    val city_name: String ,
-    val clouds: Int ,
-    val country_code: String ,
-    val datetime: String ,
-    val dewpt: Double ,
-    val dhi: Int ,
-    val dni: Int ,
-    val elev_angle: Double ,
-    val ghi: Int ,
-    val gust: Any ,
-    val h_angle: Int ,
-    val lat: Double ,
-    val lon: Double ,
-    val ob_time: String ,
-    val pod: String ,
-    val precip: Int ,
-    val pres: Double ,
-    val rh: Int ,
-    val slp: Int ,
-    val snow: Int ,
-    val solar_rad: Int ,
-    val sources: List<String> ,
-    val state_code: String ,
-    val station: String ,
-    val sunrise: String ,
-    val sunset: String ,
-    val temp: Int ,
-    val timezone: String ,
-    val ts: Int ,
-    val uv: Int ,
-    val vis: Int ,
-    val weather: threehourWeather ,
-    val wind_cdir: String ,
-    val wind_cdir_full: String ,
-    val wind_dir: Int ,
-    val wind_spd: Double
+data class CurrentClouds(
+    val all: Int
 )
 
-data class Weather(
-    val code: Int,
+data class CurrentCoord(
+    val lat: Double,
+    val lon: Double
+)
+
+data class CurrentMain(
+    val feels_like: Double,
+    val grnd_level: Int,
+    val humidity: Int,
+    val pressure: Int,
+    val sea_level: Int,
+    val temp: Double,
+    val temp_max: Double,
+    val temp_min: Double
+)
+
+data class CurrentSys(
+    val country: String,
+    val sunrise: Int,
+    val sunset: Int
+)
+
+data class CurrentWeather(
     val description: String,
-    val icon: String
+    val icon: String,
+    val id: Int,
+    val main: String
+)
+
+data class CurrentWind(
+    val deg: Int,
+    val gust: Double,
+    val speed: Double
 )

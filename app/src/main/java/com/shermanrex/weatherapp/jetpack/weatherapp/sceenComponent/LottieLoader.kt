@@ -35,11 +35,3 @@ fun LottieLoader() {
         )
     }
 }
-
-@Composable
-@Preview(showBackground = true)
-fun lottiepre(){
-    MaterialTheme {
-        LottieLoader()
-    }
-}

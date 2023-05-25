@@ -1,4 +1,4 @@
-package com.shermanrex.weatherapp.jetpack.weatherapp.sceenComponent
+package com.shermanrex.weatherapp.jetpack.weatherapp.screen
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons

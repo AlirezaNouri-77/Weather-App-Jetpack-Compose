@@ -1,4 +1,4 @@
-package com.shermanrex.weatherapp.jetpack.weatherapp.screen
+package com.shermanrex.weatherapp.jetpack.weatherapp.screen.main
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -42,7 +42,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.SearchCityApiModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.sceenComponent.LottieLoader
 import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.MyviewModel
@@ -56,7 +55,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 fun SearchCityScreen(
     navController: NavController ,
     myviewModel: MyviewModel ,
-    Click: (Int) -> Unit
+    Click: () -> Unit = {}
 ) {
 
     val stateSearchCityApi = myviewModel.searchCityApiResponse().collectAsState().value
@@ -154,14 +153,14 @@ fun SearchCityScreen(
         ) {
 
             AnimatedVisibility(visible = isplayingLottie) {
-               LottieLoader()
+                LottieLoader()
             }
 
             when (stateSearchCityApi) {
-                is ResponseResultModel.Success -> {
+                is ResponseResultModel.SearchSuccess -> {
                     isplayingLottie = false
                     LazyColumn {
-                        itemsIndexed(stateSearchCityApi.data as SearchCityApiModel) { index , item ->
+                        itemsIndexed(stateSearchCityApi.data) { index , item ->
                             ListItem(
                                 headlineText = {
                                     Text(
@@ -170,9 +169,20 @@ fun SearchCityScreen(
                                         fontSize = 16.sp
                                     )
                                 } ,
-                                supportingText = { Text(text = CodetoFullname(item.country) + "  " + item.state) } ,
+                                supportingText = {
+                                    Text(
+                                        text = CodetoFullname(item.country) + "  " + if (item.state != null) item.state else {
+                                            ""
+                                        }
+                                    )
+                                } ,
                                 modifier = Modifier.clickable {
-                                    Click(index)
+                                    myviewModel.updateDataStore(
+                                        stateSearchCityApi.data[index].lat.toDouble() ,
+                                        stateSearchCityApi.data[index].lon.toDouble() ,
+                                        myviewModel.getunitdataStore()
+                                    )
+                                    navController.popBackStack()
                                 })
                         }
                     }
