@@ -7,9 +7,12 @@ import com.shermanrex.weatherapp.jetpack.weatherapp.models.SevenDayForecastModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.ThreeHourWeatherModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.WeatherResponseMapKey
 import com.shermanrex.weatherapp.jetpack.weatherapp.retrofit.RetrofitService
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
@@ -20,104 +23,83 @@ import javax.inject.Named
 
 
 class WeatherRepository @Inject constructor(
-    @Named("WeatherbitRetrofit") var weatherbit_retrofit: Retrofit ,
-    @Named("OpenWeatherRetrofit") var openweatherretrofit: Retrofit ,
+    @Named("WeatherbitRetrofit") var weatherbitretrofit: RetrofitService,
+    @Named("OpenWeatherRetrofit") var openweatherretrofit: RetrofitService,
 ) {
 
     var _WeatherReponse = MutableStateFlow<ResponseResultModel>(ResponseResultModel.Idle)
     var WeatherResponse: StateFlow<ResponseResultModel> = _WeatherReponse
-    var WeatherResponseMap: MutableMap<String , Any> = mutableMapOf()
+    var WeatherResponseMap: MutableMap<String, Any> = mutableMapOf()
 
-    suspend fun getCurrent(lat: Double , lon: Double , unit:String) = withContext(Dispatchers.IO) {
+    suspend fun getCurrent(lat: Double, lon: Double, unit: String) {
 
-        WeatherResponseMap.clear()
         _WeatherReponse.value = ResponseResultModel.Loading
 
-        val response = openweatherretrofit.create(RetrofitService::class.java).getCurrentWeatherApi(
-            lat ,
-            lon,
-            units = unit
-        ).execute()
-        if (response.isSuccessful) {
-            WeatherResponseMap[WeatherResponseMapKey.CurrentForecast.toString()] =
-                response.body() as CurrentWeatherModel
-            getSevenDayForecast(lat , lon , unit)
-        }else if (!response.isSuccessful){
-
-
+        CoroutineScope(Dispatchers.IO).launch {
+            val response =
+                openweatherretrofit.getCurrentWeatherApi(
+                    lat,
+                    lon,
+                    unit
+                )
+            withContext(Dispatchers.IO) {
+                if (response.isSuccessful) {
+                    WeatherResponseMap.clear()
+                    WeatherResponseMap[WeatherResponseMapKey.CurrentForecast.toString()] =
+                        response.body() as CurrentWeatherModel
+                    getSevenDayForecast(lat, lon, unit)
+                }
+            }
         }
 
-//        openweatherretrofit.create(RetrofitService::class.java).getCurrentWeatherApi(
-//            35.72196 ,
-//            51.3347
-//        ).enqueue(object : Callback<CurrentWeatherModel> {
-//            override fun onResponse(
-//                call: Call<CurrentWeatherModel> ,
-//                response: Response<CurrentWeatherModel>
-//            ) {
-//                Log.d("TAG" , "onResponse: " + call.request().url())
-//                if (response.isSuccessful) {
-//                    WeatherResponseMap[WeatherResponseMapKey.CurrentForecast.toString()] =
-//                        response.body() as CurrentWeatherModel
-//                    getSevenDayForecast()
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<CurrentWeatherModel> , t: Throwable) {
-//
-//            }
-//
-//        })
+
     }
 
-    fun getSevenDayForecast(lat: Double , lon: Double, unit:String) {
-        weatherbit_retrofit.create(RetrofitService::class.java).getSevenDayWeatherApi(
-            lat ,
-            lon ,
-            units = unit
-        ).enqueue(object : Callback<SevenDayForecastModel> {
-            override fun onResponse(
-                call: Call<SevenDayForecastModel> ,
-                response: Response<SevenDayForecastModel>
-            ) {
-                Log.d("TAG" , "onResponse: " + call.request().url())
+    fun getSevenDayForecast(lat: Double, lon: Double, unit: String) {
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val response =
+                weatherbitretrofit.getSevenDayWeatherApi(
+                    lat,
+                    lon,
+                    unit
+                )
+            withContext(Dispatchers.IO) {
                 if (response.body().toString().isEmpty()) {
                     _WeatherReponse.value = ResponseResultModel.Error("Nothing Found")
                 } else if (response.isSuccessful) {
                     WeatherResponseMap[WeatherResponseMapKey.Sevendayforecast.toString()] =
                         response.body() as SevenDayForecastModel
-                    getThreeHourForecast(lat , lon , unit)
+                    getThreeHourForecast(lat, lon, unit)
                 }
             }
+        }
 
-            override fun onFailure(call: Call<SevenDayForecastModel> , t: Throwable) {
-                Log.d("TAG" , "onFailure: " + t.message)
-            }
-
-        })
     }
 
-    fun getThreeHourForecast(lat: Double , lon: Double, unit:String) {
-        openweatherretrofit.create(RetrofitService::class.java).getThreeHourWeatherApi(
-            lat ,
-            lon ,
-            units = unit
-        ).enqueue(object : Callback<ThreeHourWeatherModel> {
-            override fun onResponse(
-                call: Call<ThreeHourWeatherModel> ,
-                response: Response<ThreeHourWeatherModel>
-            ) {
-                WeatherResponseMap[WeatherResponseMapKey.ThreeHourforcast.toString()] =
-                    response.body() as ThreeHourWeatherModel
-                _WeatherReponse.value = ResponseResultModel.Success(WeatherResponseMap)
+    fun getThreeHourForecast(lat: Double, lon: Double, unit: String) {
 
-            }
+        CoroutineScope(Dispatchers.IO).launch {
+            val response =
+                openweatherretrofit.getThreeHourWeatherApi(
+                    lat,
+                    lon,
+                    units = unit
+                )
+            withContext(Dispatchers.IO) {
+                if (response.isSuccessful) {
+                    WeatherResponseMap[WeatherResponseMapKey.ThreeHourforcast.toString()] =
+                        response.body() as ThreeHourWeatherModel
+                    _WeatherReponse.value = ResponseResultModel.Success(WeatherResponseMap)
+                } else {
 
-            override fun onFailure(call: Call<ThreeHourWeatherModel> , t: Throwable) {
-                TODO("Not yet implemented")
+                }
             }
-        })
+        }
     }
 
+    fun setWeatherResposneResult() {
+        _WeatherReponse.value = ResponseResultModel.Empty
+    }
 
 }

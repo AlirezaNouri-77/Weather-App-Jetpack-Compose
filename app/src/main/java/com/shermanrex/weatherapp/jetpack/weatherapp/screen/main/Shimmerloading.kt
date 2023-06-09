@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.shermanrex.weatherapp.jetpack.weatherapp.sceenComponent.shimmerffect
+import com.shermanrex.weatherapp.jetpack.weatherapp.util.shimmerffect
 
 @Composable
 fun Shimmerloading() {
@@ -45,11 +45,6 @@ fun shimmerloadingCurrent() {
                     .width(160.dp)
                     .height(30.dp)
                     .shimmerffect()
-//                    .background(
-//                        brush = shimmerEffect(
-//                            showShimmer = true
-//                        )
-//                    )
             )
             Spacer(modifier = Modifier.size(10.dp))
             Box(
@@ -57,11 +52,6 @@ fun shimmerloadingCurrent() {
                     .width(120.dp)
                     .height(40.dp)
                     .shimmerffect()
-//                    .background(
-//                        brush = shimmerEffect(
-//                            showShimmer = true
-//                        )
-//                    )
             )
             Spacer(modifier = Modifier.size(10.dp))
             Box(

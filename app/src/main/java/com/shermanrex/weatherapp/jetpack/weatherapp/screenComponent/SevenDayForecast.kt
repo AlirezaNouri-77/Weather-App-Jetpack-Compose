@@ -1,6 +1,5 @@
-package com.shermanrex.weatherapp.jetpack.weatherapp.screen
+package com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,20 +10,21 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,6 +43,7 @@ import com.shermanrex.weatherapp.jetpack.weatherapp.models.ForecastData
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.SevenDayForecastModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.ui.theme.WeatherAppTheme
 import com.shermanrex.weatherapp.jetpack.weatherapp.util.WeatherIconFinder
+import kotlin.math.roundToInt
 
 @Composable
 fun SevenDayForecast(data: SevenDayForecastModel) {
@@ -52,17 +53,19 @@ fun SevenDayForecast(data: SevenDayForecastModel) {
     }
 
     Card(
-        Modifier.padding(5.dp) ,
+        Modifier.padding(top = 5.dp  , start = 10.dp, end = 10.dp) ,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4F)
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3F)
         )
     ) {
         Text(
             text = "7-day forecast" ,
             Modifier.padding(top = 10.dp , bottom = 4.dp , start = 10.dp , end = 10.dp) ,
-            color = MaterialTheme.colorScheme.onPrimary
-
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp
         )
+
         LazyColumn(
             Modifier
                 .heightIn(max = 900.dp)
@@ -70,7 +73,7 @@ fun SevenDayForecast(data: SevenDayForecastModel) {
         ) {
             itemsIndexed(data.data) { index , item ->
                 if (index!=0) {
-                    SevenDayForeCastListItem(item , WeatherIconFinder)
+                    SevenDayForeCastListItem(ForecastData = item , WeatherIconFinder = WeatherIconFinder)
                 }
             }
         }
@@ -78,20 +81,27 @@ fun SevenDayForecast(data: SevenDayForecastModel) {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SevenDayForeCastListItem(
-    forecastData: ForecastData ,
+    ForecastData: ForecastData,
     WeatherIconFinder: WeatherIconFinder
 ) {
 
-    var showDetail by rememberSaveable {
+    var showBottomSheet by remember {
+        mutableStateOf(false)
+    }
+
+    val bottomState = rememberModalBottomSheetState()
+
+    val showDetail by rememberSaveable {
         mutableStateOf(false)
     }
 
     Column(
         verticalArrangement = Arrangement.Center ,
         modifier = Modifier.clickable {
-            showDetail = !showDetail
+            showBottomSheet = true
         }
     ) {
         Row(
@@ -107,35 +117,36 @@ private fun SevenDayForeCastListItem(
                 Image(
                     painter = painterResource(
                         id = WeatherIconFinder.getIcon(
-                            forecastData.weather.code ,
-                            forecastData.weather.icon.contains("n")
+                            ForecastData.weather.code ,
+                            ForecastData.weather.icon.contains("n")
                         )
                     ) ,
                     contentDescription = "" ,
                     Modifier
                         .size(40.dp)
+                        .padding(start = 5.dp)
                 )
 
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally ,
-                    verticalArrangement = Arrangement.Center
+                    horizontalAlignment = Alignment.Start ,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(start = 5.dp)
                 ) {
                     Text(
-                        text = forecastData.weather.description ,
-                        fontSize = 12.sp ,
+                        text = ForecastData.weather.description ,
+                        fontSize = 14.sp ,
                         fontWeight = FontWeight.Light ,
                         color = MaterialTheme.colorScheme.onPrimary ,
                     )
                     Text(
-                        text = forecastData.valid_date ,
-                        fontSize = 10.sp ,
+                        text = ForecastData.valid_date ,
+                        fontSize = 12.sp ,
                         fontWeight = FontWeight.Light ,
                         color = MaterialTheme.colorScheme.onPrimary ,
                     )
                 }
 
             }
-
             Column(
                 Modifier
                     .weight(0.5F) ,
@@ -151,7 +162,7 @@ private fun SevenDayForeCastListItem(
                             color = MaterialTheme.colorScheme.onPrimary ,
                         ) ,
                         block = {
-                            append(forecastData.temp.toString() + "°")
+                            append(ForecastData.temp.roundToInt().toString() + "°")
                         }
                     )
                 })
@@ -177,7 +188,7 @@ private fun SevenDayForeCastListItem(
                     )
                     Text(
                         modifier = Modifier.align(alignment = Alignment.CenterVertically) ,
-                        text = forecastData.max_temp.toString() ,
+                        text = ForecastData.max_temp.roundToInt().toString() ,
                         fontWeight = FontWeight.Light ,
                         color = MaterialTheme.colorScheme.onPrimary ,
                         fontSize = 12.sp
@@ -190,32 +201,17 @@ private fun SevenDayForeCastListItem(
                     Text(
                         modifier = Modifier
                             .align(alignment = Alignment.CenterVertically) ,
-                        text = forecastData.min_temp.toString() ,
+                        text = ForecastData.min_temp.roundToInt().toString() ,
                         fontWeight = FontWeight.Light ,
                         color = MaterialTheme.colorScheme.onPrimary ,
                         fontSize = 12.sp
                     )
                 }
             }
-
         }
-        AnimatedVisibility(visible = showDetail) {
-            LazyVerticalGrid(
-                verticalArrangement = Arrangement.Center ,
-                horizontalArrangement = Arrangement.Center ,
-                modifier = Modifier.heightIn(max = 900.dp) ,
-                columns = GridCells.Fixed(2) ,
-                content = {
-                    repeat(10) {
-                        item {
-                            SevenDayForecastDetail(
-                                imageInt = R.drawable.precipitation ,
-                                subject = "precipitation" ,
-                                desc = "10%"
-                            )
-                        }
-                    }
-                })
+
+        if(showBottomSheet) {
+            DetailBottomSheet(onDismiss = { showBottomSheet = false } , ForecastData = ForecastData, sheetState = bottomState)
         }
 
         Column(

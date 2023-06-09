@@ -1,4 +1,4 @@
-package com.shermanrex.weatherapp.jetpack.weatherapp.sceenComponent
+package com.shermanrex.weatherapp.jetpack.weatherapp.util
 
 import androidx.compose.animation.core.InfiniteRepeatableSpec
 import androidx.compose.animation.core.animateFloat
@@ -29,7 +29,7 @@ fun Modifier.shimmerffect(): Modifier = composed {
     val trasition = rememberInfiniteTransition()
     val startoffsetx by trasition.animateFloat(
         initialValue = -2 * size.width.toFloat() ,
-        targetValue = 2 * size.width.toFloat() ,
+        targetValue = 3 * size.width.toFloat() ,
         animationSpec = InfiniteRepeatableSpec(tween(1500))
     )
 

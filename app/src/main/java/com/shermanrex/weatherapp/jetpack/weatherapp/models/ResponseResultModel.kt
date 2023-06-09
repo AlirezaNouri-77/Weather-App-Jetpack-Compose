@@ -7,7 +7,6 @@ sealed class ResponseResultModel {
     data class Error(val error: String) : ResponseResultModel()
     object Idle : ResponseResultModel()
     object Loading : ResponseResultModel()
-
     object Empty:ResponseResultModel()
 
 }

@@ -16,10 +16,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -43,22 +43,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
-import com.shermanrex.weatherapp.jetpack.weatherapp.sceenComponent.LottieLoader
-import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.MyviewModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.navigation.NavControllerModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.util.LottieLoader
+import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.SearchViewModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.WeatherViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.runBlocking
 
-@OptIn(ExperimentalMaterial3Api::class , FlowPreview::class)
+@OptIn(FlowPreview::class)
 @Composable
 fun SearchCityScreen(
-    navController: NavController ,
-    myviewModel: MyviewModel ,
-    Click: () -> Unit = {}
+    navController: NavController,
+    searchViewModel: SearchViewModel,
+    weatherViewModel: WeatherViewModel
 ) {
 
-    val stateSearchCityApi = myviewModel.searchCityApiResponse().collectAsState().value
+    val stateSearchCityApi = searchViewModel.searchCityApiResponse().collectAsState().value
 
     var textFieldChangeValue by remember {
         mutableStateOf("")
@@ -68,12 +71,12 @@ fun SearchCityScreen(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(key1 = textFieldChangeValue , block = {
+    LaunchedEffect(key1 = textFieldChangeValue, block = {
         snapshotFlow {
             textFieldChangeValue
         }.debounce(1500L).distinctUntilChanged().collectLatest {
             if (it.length >= 2) {
-                myviewModel.callSearchCityApi(it)
+                searchViewModel.callSearchCityApi(it)
             }
         }
     })
@@ -81,63 +84,65 @@ fun SearchCityScreen(
     Scaffold(
         topBar = {
             TextField(
-                value = textFieldChangeValue ,
+                value = textFieldChangeValue,
                 onValueChange = {
                     textFieldChangeValue = it
-                } ,
-                singleLine = true ,
+                },
+                singleLine = true,
                 leadingIcon = {
                     Row(content = {
                         IconButton(onClick = {
-                            navController.popBackStack()
+                            navController.navigate(NavControllerModel.MainApp.Route)
                         }) {
                             Icon(
-                                imageVector = Icons.Default.ArrowBack ,
-                                contentDescription = "" ,
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "",
                                 tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     })
-                } ,
+                },
                 trailingIcon = {
                     IconButton(onClick = {
                         textFieldChangeValue = ""
                     }) {
                         if (textFieldChangeValue.isNotEmpty()) {
                             Icon(
-                                imageVector = Icons.Default.Close ,
-                                contentDescription = "" ,
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "",
                                 tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
-                } ,
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp) ,
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = MaterialTheme.colorScheme.primary ,
-                    focusedIndicatorColor = Color.Transparent ,
-                    unfocusedIndicatorColor = Color.Transparent ,
-                    disabledIndicatorColor = Color.Transparent ,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary ,
-                    textColor = MaterialTheme.colorScheme.onPrimary
-                ) ,
+                    .height(60.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    disabledContainerColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary,
+                    focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                ),
                 placeholder = {
                     Text(
-                        text = "Enter a City Name" ,
-                        color = MaterialTheme.colorScheme.onPrimary ,
-                        textAlign = TextAlign.Center ,
+                        text = "Enter a City Name",
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6F),
+                        textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(15.dp , 0.dp , 15.dp , 0.dp)
+                            .padding(15.dp, 0.dp, 15.dp, 0.dp)
                     )
-                } ,
-                shape = RoundedCornerShape(0.dp) ,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search) ,
+                },
+                shape = RoundedCornerShape(0.dp),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(
                     onSearch = {
-                        myviewModel.callSearchCityApi(textFieldChangeValue)
+                        searchViewModel.callSearchCityApi(textFieldChangeValue)
                     }
                 )
             )
@@ -147,8 +152,8 @@ fun SearchCityScreen(
         Column(
             Modifier
                 .padding(it)
-                .fillMaxWidth() ,
-            verticalArrangement = Arrangement.Top ,
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -160,30 +165,36 @@ fun SearchCityScreen(
                 is ResponseResultModel.SearchSuccess -> {
                     isplayingLottie = false
                     LazyColumn {
-                        itemsIndexed(stateSearchCityApi.data) { index , item ->
+                        itemsIndexed(stateSearchCityApi.data) { index, item ->
                             ListItem(
-                                headlineText = {
+                                headlineContent = {
                                     Text(
-                                        text = item.name ,
-                                        fontWeight = FontWeight.SemiBold ,
+                                        text = item.name,
+                                        fontWeight = FontWeight.SemiBold,
                                         fontSize = 16.sp
                                     )
-                                } ,
-                                supportingText = {
+                                },
+                                supportingContent = {
                                     Text(
-                                        text = CodetoFullname(item.country) + "  " + if (item.state != null) item.state else {
+                                        text = codetoFullname(item.country) + "  " + if (item.state != null) item.state else {
                                             ""
                                         }
                                     )
-                                } ,
+                                },
                                 modifier = Modifier.clickable {
-                                    myviewModel.updateDataStore(
-                                        stateSearchCityApi.data[index].lat.toDouble() ,
-                                        stateSearchCityApi.data[index].lon.toDouble() ,
-                                        myviewModel.getunitdataStore()
+                                    runBlocking {
+                                        weatherViewModel.updateCoordinatorDataStore(
+                                            stateSearchCityApi.data[index].lat.toDouble(),
+                                            stateSearchCityApi.data[index].lon.toDouble()
+                                        )
+                                    }
+                                    weatherViewModel.callWeatherRepository(
+                                        stateSearchCityApi.data[index].lat.toDouble(),
+                                        stateSearchCityApi.data[index].lon.toDouble(),
                                     )
-                                    navController.popBackStack()
-                                })
+                                    navController.navigate(NavControllerModel.MainApp.Route)
+                                }, colors = ListItemDefaults.colors(overlineColor = Color.Black)
+                            )
                         }
                     }
                 }
@@ -196,9 +207,9 @@ fun SearchCityScreen(
                     LazyColumn {
                         item {
                             ListItem(
-                                headlineText = {
+                                headlineContent = {
                                     Text(
-                                        text = stateSearchCityApi.error ,
+                                        text = stateSearchCityApi.error,
                                         fontWeight = FontWeight.SemiBold
                                     )
                                 }
@@ -215,7 +226,7 @@ fun SearchCityScreen(
     }
 }
 
-private fun CodetoFullname(Code: String): String {
-    val locale = java.util.Locale("EN" , Code)
+private fun codetoFullname(Code: String): String {
+    val locale = java.util.Locale("EN", Code)
     return locale.getDisplayCountry(locale)
 }
