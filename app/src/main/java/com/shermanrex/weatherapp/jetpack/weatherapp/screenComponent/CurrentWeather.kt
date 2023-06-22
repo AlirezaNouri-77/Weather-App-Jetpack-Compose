@@ -42,10 +42,6 @@ fun CurrentWeather(
     onMoreDetail: () -> Unit
 ) {
 
-    var showDetail by rememberSaveable {
-        mutableStateOf(false)
-    }
-
     val degreeUnit = if (weatherUnitDataStore == "METRIC") CELSIUS_SYMBOL else FAHRENHEIT_SYMBOL
 
     Box(Modifier.padding(bottom = 10.dp, top = 10.dp)) {
@@ -69,12 +65,14 @@ fun CurrentWeather(
                         else -> {}
                     }
                 })
+
             Text(
                 text = data.name,
                 fontWeight = FontWeight.Light,
                 fontSize = 24.sp,
                 color = MaterialTheme.colorScheme.onPrimary
             )
+
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically

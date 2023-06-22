@@ -45,7 +45,6 @@ fun DetailBottomSheet(
     ForecastData: ForecastData,
 ) {
 
-
     ModalBottomSheet(
         onDismissRequest = { onDismiss.invoke() },
         shape = RoundedCornerShape(topEnd = 15.dp, topStart = 15.dp),

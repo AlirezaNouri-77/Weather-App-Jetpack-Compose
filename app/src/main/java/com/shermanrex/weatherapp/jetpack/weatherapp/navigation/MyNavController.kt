@@ -1,5 +1,6 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -10,24 +11,28 @@ import com.shermanrex.weatherapp.jetpack.weatherapp.screen.main.SearchCityScreen
 import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.SearchViewModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.WeatherViewModel
 
+
 @Composable
-fun MyNavController(navController: NavHostController){
+fun MyNavController(navController: NavHostController) {
 
     val weatherViewModel = viewModel<WeatherViewModel>()
     val searchViewModel = viewModel<SearchViewModel>()
 
-    NavHost(navController = navController , startDestination = NavControllerModel.MainApp.Route ){
-        composable(NavControllerModel.MainApp.Route){
-            MainApp(navController  , weatherViewModel)
+    NavHost(navController = navController, startDestination = NavControllerModel.MainApp.Route) {
+        composable(NavControllerModel.MainApp.Route) {
+            MainApp(navController, weatherViewModel)
         }
 
-        composable(NavControllerModel.SearchCityScreen.Route){
-            SearchCityScreen(navController,searchViewModel , weatherViewModel)
+        composable(NavControllerModel.SearchCityScreen.Route) {
+            SearchCityScreen(navController, searchViewModel, weatherViewModel)
         }
+
     }
+
+
 }
 
-sealed class NavControllerModel(var Route:String){
-    object MainApp:NavControllerModel("MainApp")
-    object SearchCityScreen:NavControllerModel("SearchScreenScreen")
+sealed class NavControllerModel(var Route: String) {
+    object MainApp : NavControllerModel("MainApp")
+    object SearchCityScreen : NavControllerModel("SearchScreenScreen")
 }

@@ -7,7 +7,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,9 +20,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -37,15 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.shermanrex.weatherapp.jetpack.weatherapp.Constant.Constant.CELSIUS_SYMBOL
-import com.shermanrex.weatherapp.jetpack.weatherapp.Constant.Constant.FAHRENHEIT_SYMBOL
 import com.shermanrex.weatherapp.jetpack.weatherapp.R
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.CurrentWeatherModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
@@ -71,7 +61,7 @@ fun MainApp(navController: NavController, weatherViewModel: WeatherViewModel) {
 
     val listState = rememberLazyListState()
 
-    var scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
     var alreadyShowedPermission by rememberSaveable {
         mutableStateOf(false)
@@ -100,6 +90,7 @@ fun MainApp(navController: NavController, weatherViewModel: WeatherViewModel) {
         },
         modifier = Modifier.fillMaxSize()
     ) { it ->
+
         Box(
             Modifier
                 .background(
@@ -158,7 +149,6 @@ fun MainApp(navController: NavController, weatherViewModel: WeatherViewModel) {
                                 },
                                 onMoreDetail = {
                                     scope.launch {
-
                                         listState.animateScrollToItem(4)
                                     }
                                 }
@@ -173,7 +163,9 @@ fun MainApp(navController: NavController, weatherViewModel: WeatherViewModel) {
                         item {
                             LazyVerticalGrid(columns = GridCells.Fixed(2),
                                 Modifier.heightIn(max = 1000.dp),
-                                contentPadding = PaddingValues(10.dp),
+                                contentPadding = PaddingValues(5.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalArrangement = Arrangement.Center,
                                 content = {
                                     item {
                                         val description =
@@ -189,7 +181,8 @@ fun MainApp(navController: NavController, weatherViewModel: WeatherViewModel) {
                                             Headline = "Feels Like",
                                             Value = currentResponseData.main.feels_like.roundToInt()
                                                 .toString(),
-                                            Desc = description
+                                            Desc = description,
+                                            backgroundcolor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3F)
                                         )
                                     }
                                     item {
@@ -197,6 +190,7 @@ fun MainApp(navController: NavController, weatherViewModel: WeatherViewModel) {
                                             icon = R.drawable.icon_pressure,
                                             Headline = "Pressure",
                                             Value = currentResponseData.main.pressure.toString(),
+                                            backgroundcolor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3F)
                                         )
                                     }
                                     item {
@@ -204,6 +198,7 @@ fun MainApp(navController: NavController, weatherViewModel: WeatherViewModel) {
                                             icon = R.drawable.icon_cloud,
                                             Headline = "Cloud",
                                             Value = currentResponseData.clouds.all.toString() + " %",
+                                            backgroundcolor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3F)
                                         )
                                     }
                                     item {
@@ -211,6 +206,7 @@ fun MainApp(navController: NavController, weatherViewModel: WeatherViewModel) {
                                             icon = R.drawable.icon_visibility,
                                             Headline = "Visibility",
                                             Value = currentResponseData.visibility.toString(),
+                                            backgroundcolor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3F)
                                         )
                                     }
                                     item {
@@ -218,6 +214,7 @@ fun MainApp(navController: NavController, weatherViewModel: WeatherViewModel) {
                                             icon = R.drawable.icon_humidity,
                                             Headline = "Humidity",
                                             Value = currentResponseData.main.humidity.toString() + " %",
+                                            backgroundcolor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3F)
                                         )
                                     }
                                     item {
@@ -226,6 +223,7 @@ fun MainApp(navController: NavController, weatherViewModel: WeatherViewModel) {
                                             Headline = "Wind Speed",
                                             Value = currentResponseData.wind.speed.roundToInt()
                                                 .toString(),
+                                            backgroundcolor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3F)
                                         )
                                     }
                                     item {
@@ -233,6 +231,7 @@ fun MainApp(navController: NavController, weatherViewModel: WeatherViewModel) {
                                             icon = R.drawable.icon_winddirection,
                                             Headline = "Wind Direction",
                                             Value = currentResponseData.wind.deg.toString(),
+                                            backgroundcolor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3F)
                                         )
                                     }
                                 })
