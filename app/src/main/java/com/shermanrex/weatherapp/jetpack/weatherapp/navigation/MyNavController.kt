@@ -1,6 +1,5 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.navigation
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -22,14 +21,10 @@ fun MyNavController(navController: NavHostController) {
         composable(NavControllerModel.MainApp.Route) {
             MainApp(navController, weatherViewModel)
         }
-
         composable(NavControllerModel.SearchCityScreen.Route) {
             SearchCityScreen(navController, searchViewModel, weatherViewModel)
         }
-
     }
-
-
 }
 
 sealed class NavControllerModel(var Route: String) {

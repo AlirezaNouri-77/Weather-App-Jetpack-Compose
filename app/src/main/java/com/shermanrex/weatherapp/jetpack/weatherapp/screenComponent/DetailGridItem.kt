@@ -1,15 +1,17 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -28,72 +30,80 @@ import com.shermanrex.weatherapp.jetpack.weatherapp.R
 import com.shermanrex.weatherapp.jetpack.weatherapp.ui.theme.WeatherAppTheme
 
 @Composable
-fun BottomSheetGridLayout(
+fun DetailGridItem(
     icon: Int,
-    Headline: String,
-    Value: String,
-    Desc: String = "",
-    backgroundcolor: Color = Color.Transparent
+    iconDescription: String,
+    value: String,
+    Description: String = "",
+    textColor: Color = MaterialTheme.colorScheme.onPrimary,
+    backgroundColor: Color = MaterialTheme.colorScheme.onBackground
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = backgroundcolor), modifier = Modifier
-            .fillMaxSize().padding(5.dp),
+        colors = CardDefaults.cardColors(
+            backgroundColor
+        ),
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(5.dp)
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
 
             ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(10.dp)
+            ) {
                 Image(
                     painter = painterResource(id = icon),
                     contentDescription = "",
                     modifier = Modifier
-                        .size(20.dp)
-                        .padding(end = 5.dp)
-                        .fillMaxWidth()
-                        .weight(0.2F),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSecondary)
+                        .size(25.dp)
+                        .wrapContentSize(),
+                    colorFilter = ColorFilter.tint(textColor)
                 )
+                Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    text = Headline, fontWeight = FontWeight.Medium, fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onSecondary,
+                    text = iconDescription, fontWeight = FontWeight.Medium, fontSize = 15.sp,
+                    color = textColor,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(0.8F)
                 )
             }
             Text(
-                text = Value,
+                text = value,
                 Modifier
-                    .padding(top = 15.dp, start = 10.dp)
+                    .padding(10.dp)
                     .fillMaxWidth(),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSecondary
+                color = textColor
             )
+
             Text(
-                text = Desc,
-                fontSize = 13.sp,
+                text = Description,
+                Modifier
+                    .padding(5.dp)
+                    .fillMaxWidth(),
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Light,
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 10.dp, top = 5.dp)
+                color = textColor
             )
+
         }
     }
 
 }
 
-@Preview(showBackground = true)
+@Preview()
 @Composable
 fun Previewtest() {
     WeatherAppTheme() {
-        BottomSheetGridLayout(
+        DetailGridItem(
             icon = R.drawable.precipitation,
-            Headline = "Precipitation",
-            Value = 20.toString()
+            iconDescription = "Precipitation",
+            value = 20.toString()
         )
     }
 }

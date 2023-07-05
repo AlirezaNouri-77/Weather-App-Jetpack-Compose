@@ -1,13 +1,13 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.di
 
 import android.content.Context
+import android.net.ConnectivityManager
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.preferencesDataStore
-import com.shermanrex.weatherapp.jetpack.weatherapp.repository.SearchCityApiRepository
+import com.shermanrex.weatherapp.jetpack.weatherapp.repository.SearchCityRepository
 import com.shermanrex.weatherapp.jetpack.weatherapp.repository.WeatherRepository
 import com.shermanrex.weatherapp.jetpack.weatherapp.retrofit.RetrofitService
-import com.shermanrex.weatherapp.jetpack.weatherapp.util.myDataStore
-import com.shermanrex.weatherapp.jetpack.weatherapp.util.locationPermission
+import com.shermanrex.weatherapp.jetpack.weatherapp.datastore.MyDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -58,27 +58,26 @@ class MyModules {
     }
 
     @Provides
-    fun searchCityApiRepo(): SearchCityApiRepository {
-        return SearchCityApiRepository(retrofit())
+    fun provideconnectivitymanager(@ApplicationContext context: Context) : ConnectivityManager {
+        return context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    }
+    @Provides
+    fun searchCityApiRepo(@ApplicationContext context: Context): SearchCityRepository {
+        return SearchCityRepository(retrofit(),context)
     }
 
     @Provides
-    fun locationPermission(@ApplicationContext context: Context): locationPermission {
-        return com.shermanrex.weatherapp.jetpack.weatherapp.util.locationPermission(context)
-    }
-
-
-    @Provides
-    fun WeatherRepository(): WeatherRepository {
+    fun WeatherRepository(@ApplicationContext context: Context): WeatherRepository {
         return WeatherRepository(
             weatherbitretrofit = WeatherbitRetrofit(),
-            openweatherretrofit = OpenWeatherRetrofit()
+            openweatherretrofit = OpenWeatherRetrofit(),
+            context = context
         )
     }
 
     @Provides
-    fun provideWeatherDataStore(@ApplicationContext context: Context): myDataStore {
-        return myDataStore(provideDataStore(context))
+    fun provideWeatherDataStore(@ApplicationContext context: Context): MyDataStore {
+        return MyDataStore(provideDataStore(context))
     }
 
     @Provides
@@ -90,8 +89,10 @@ class MyModules {
     private fun okhttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor())
-            .callTimeout(60,  TimeUnit.SECONDS)
-            .connectTimeout(60, TimeUnit.SECONDS)
+            .callTimeout(30,  TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .callTimeout(30,TimeUnit.SECONDS)
+            .readTimeout(30,TimeUnit.SECONDS)
             .build()
     }
 

@@ -1,26 +1,29 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent
 
+import android.content.res.Configuration
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.asComposePath
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.ForecastData
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.WeatherChartModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.ui.theme.WeatherAppTheme
 import com.shermanrex.weatherapp.jetpack.weatherapp.util.timeStampFormatter
 import kotlin.math.roundToInt
 
@@ -34,21 +37,14 @@ fun WeatherChart(
     }
 
     val inputList: MutableList<WeatherChartModel> = data as MutableList<WeatherChartModel>
-//    for (index in data.indices) {
-//        inputList.add(
-//            WeatherChartModel(
-//                timeStampFormatter.timeStampFormatterSevenDay(data[index].ts.toLong()),
-//                data[index].temp
-//            ))
-//    }
 
     val chartSpacer = 100f
 
     val uppervalue = remember(inputList) {
-        inputList.maxOfOrNull { it.value }?.plus(1) ?: 0.0
+        inputList.maxOfOrNull { it.value } ?: 0.0
     }
 
-    val colorChart = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.6f)
+    val colorChart = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.8f)
 
     val lowervalue = remember(inputList) {
         inputList.minOfOrNull { it.value } ?: 0.0
@@ -66,8 +62,7 @@ fun WeatherChart(
         }
     }
 
-    Box(modifier = Modifier.fillMaxWidth()) {
-
+    Box(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
@@ -75,31 +70,19 @@ fun WeatherChart(
         ) {
 
             val spacerPerDate = (size.width - chartSpacer) / inputList.size
-            val spacerPerValue = (size.height - chartSpacer) / 5f
+            val spacerPerValue = (size.height - chartSpacer) / 6f
 
 
             (inputList.indices).forEach { index ->
                 drawContext.canvas.nativeCanvas.drawText(
-                    inputList[index].date.toString(),
+                    timeStampFormatter.timeStampFormatterChart(inputList[index].date),
                     chartSpacer + (index * spacerPerDate),
                     size.height - 30,
                     textPaint
                 )
             }
 
-
-//            (0..4).forEach {
-//                drawContext.canvas.nativeCanvas.drawLine(
-//                    chartSpacer,
-//                    (size.height - chartSpacer - (it * spacerPerValue)) - 10,
-//                    size.width - 20,
-//                    (size.height - chartSpacer - (it * spacerPerValue)) - 10,
-//                    textPaint
-//                )
-//            }
-
-
-            (0..4).forEach { index ->
+            (0..5).forEach { index ->
                 drawContext.canvas.nativeCanvas.drawText(
                     (lowervalue + index * valueStep).roundToInt().toString(),
                     35f,
@@ -117,8 +100,8 @@ fun WeatherChart(
                     val currentValue = inputList[index].value
                     val nextValue = inputList.getOrNull(index + 1)?.value ?: inputList.last().value
 
-                    val currentvaluerate = (currentValue - lowervalue) / (uppervalue - lowervalue)
-                    val nextvaluerate = (nextValue - lowervalue) / (uppervalue - lowervalue)
+                    val currentvaluerate = (currentValue - lowervalue) / (uppervalue.plus(1) - lowervalue)
+                    val nextvaluerate = (nextValue - lowervalue) / (uppervalue.plus(1) - lowervalue)
 
                     val x1 = chartSpacer + (index * spacerPerDate)
                     val y1 = size.height - chartSpacer - (currentvaluerate * size.height)
@@ -152,13 +135,10 @@ fun WeatherChart(
                 brush = Brush.verticalGradient(
                         colors = listOf(
                             colorChart,
-                            androidx.compose.ui.graphics.Color.Transparent
+                            Color.Transparent
                         ),
                     endY = size.height - chartSpacer
                 ),
-                style = Stroke(
-                    width = 2.dp.toPx(),
-                )
             )
 
         }
@@ -166,24 +146,24 @@ fun WeatherChart(
 }
 
 
-//@Preview(showBackground = true)
-//@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_UNDEFINED, showBackground = true)
-//@Preview(name = "Full Preview", showSystemUi = true)
-//@Composable
-//fun previewMychart() {
-//    WeatherAppTheme() {
-//        Box(Modifier.fillMaxWidth()) {
-//            WeatherChart(
-//                inputList = listOf(
-//                    WeatherChartModel("Tom", 34.0),
-//                    WeatherChartModel("jul", 36.0),
-//                    WeatherChartModel("mol", 38.0),
-//                    WeatherChartModel("koa", 39.0),
-//                    WeatherChartModel("cas", 40.0),
-//                    WeatherChartModel("gfa", 37.0),
-//                    WeatherChartModel("as", 33.0),
-//                )
-//            )
-//        }
-//    }
-//}
+@Preview(showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_UNDEFINED, showBackground = true)
+@Preview(name = "Full Preview", showSystemUi = true)
+@Composable
+fun PreviewMychart() {
+    WeatherAppTheme() {
+        Box(Modifier.fillMaxWidth()) {
+            WeatherChart(
+                data = listOf(
+                    WeatherChartModel(10000000, 34.0),
+                    WeatherChartModel(10000000, 36.0),
+                    WeatherChartModel(10000000, 38.0),
+                    WeatherChartModel(10000000, 39.0),
+                    WeatherChartModel(10000000, 37.0),
+                    WeatherChartModel(10000000, 40.0),
+                    WeatherChartModel(10000000, 33.0),
+                )
+            )
+        }
+    }
+}

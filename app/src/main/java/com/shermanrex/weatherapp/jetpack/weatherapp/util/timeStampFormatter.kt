@@ -15,9 +15,15 @@ class timeStampFormatter:timeStampFormmaterInterface {
             .format(Instant.ofEpochSecond(timestamp)).toString()
     }
 
+    override fun timeStampFormatterChart(timestamp: Long): String {
+        return DateTimeFormatter.ofPattern("ccc").withZone(ZoneId.of("GMT"))
+            .format(Instant.ofEpochSecond(timestamp)).toString()
+    }
+
 }
 
 interface timeStampFormmaterInterface {
     fun timeStampFormatterThreehour(timestamp:Long):String
     fun timeStampFormatterSevenDay(timestamp:Long):String
+    fun timeStampFormatterChart(timestamp:Long):String
 }

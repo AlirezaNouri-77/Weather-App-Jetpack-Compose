@@ -28,78 +28,66 @@ fun Shimmerloading() {
         horizontalAlignment = Alignment.CenterHorizontally ,
         modifier = Modifier.fillMaxSize()
     ) {
-        shimmerloadingCurrent()
-    }
-}
+        Box {
+            Column(
+                verticalArrangement = Arrangement.Center ,
+                horizontalAlignment = Alignment.CenterHorizontally ,
+            ) {
+                Spacer(modifier = Modifier.size(10.dp))
+                Box(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(30.dp)
+                        .shimmerffect()
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+                Box(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(40.dp)
+                        .shimmerffect()
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+                Box(
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(30.dp)
+                        .shimmerffect()
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+                Box(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(30.dp)
+                        .shimmerffect()
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+                Box(
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(20.dp)
+                        .shimmerffect()
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+                Surface(
+                    modifier = Modifier
+                        .padding(start = 10.dp , end = 10.dp)
+                        .shimmerffect()
+                        .fillMaxWidth()
+                        .height(70.dp) , shape = RoundedCornerShape(10.dp) ,
+                    color = Color.Transparent
+                ) {}
+                Spacer(modifier = Modifier.size(10.dp))
+                Surface(
+                    modifier = Modifier
+                        .padding(start = 10.dp , end = 10.dp)
+                        .shimmerffect()
+                        .fillMaxWidth()
+                        .height(500.dp) ,
+                    color = Color.Transparent
+                ) {}
 
-@Composable
-fun shimmerloadingCurrent() {
-    Box {
-        Column(
-            verticalArrangement = Arrangement.Center ,
-            horizontalAlignment = Alignment.CenterHorizontally ,
-        ) {
-            Spacer(modifier = Modifier.size(10.dp))
-            Box(
-                modifier = Modifier
-                    .width(160.dp)
-                    .height(30.dp)
-                    .shimmerffect()
-            )
-            Spacer(modifier = Modifier.size(10.dp))
-            Box(
-                modifier = Modifier
-                    .width(120.dp)
-                    .height(40.dp)
-                    .shimmerffect()
-            )
-            Spacer(modifier = Modifier.size(10.dp))
-            Box(
-                modifier = Modifier
-                    .width(80.dp)
-                    .height(30.dp)
-                    .shimmerffect()
-            )
-            Spacer(modifier = Modifier.size(10.dp))
-            Box(
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(30.dp)
-                    .shimmerffect()
-            )
-            Spacer(modifier = Modifier.size(10.dp))
-            Box(
-                modifier = Modifier
-                    .width(80.dp)
-                    .height(20.dp)
-                    .shimmerffect()
-            )
-            Surface(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .shimmerffect()
-                    .fillMaxWidth()
-                    .height(70.dp) , shape = RoundedCornerShape(10.dp) ,
-                color = Color.Transparent
-            ) {}
-
-            Surface(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .shimmerffect()
-                    .fillMaxWidth()
-                    .height(500.dp) ,
-                color = Color.Transparent
-            ) {}
-
+            }
         }
-    }
-}
-
-@Preview
-@Composable
-fun show() {
-    MaterialTheme {
-        Shimmerloading()
     }
 }

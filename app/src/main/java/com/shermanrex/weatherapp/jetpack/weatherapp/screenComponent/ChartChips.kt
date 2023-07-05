@@ -24,7 +24,8 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun ChartChips(
-    onClick: (WeatherChartEnum) -> Unit
+    onClick: (WeatherChartEnum) -> Unit,
+    modifier: Modifier = Modifier
 ) {
 
     val chartList = listOf(
@@ -80,7 +81,7 @@ fun ChartChipsItem(
             text = chipsText,
             textAlign = TextAlign.Center,
             fontSize = 12.sp,
-            color = if (isCheckIndex == index) Color.White else MaterialTheme.colorScheme.onSecondary,
+            color = if (isCheckIndex == index) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.secondaryContainer,
             fontWeight = FontWeight.SemiBold
         )
     }

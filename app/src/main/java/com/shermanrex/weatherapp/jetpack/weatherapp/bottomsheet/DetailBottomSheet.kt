@@ -1,10 +1,11 @@
-package com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent
+package com.shermanrex.weatherapp.jetpack.weatherapp.bottomsheet
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -24,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shermanrex.weatherapp.jetpack.weatherapp.R
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.ForecastData
+import com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent.DetailGridItem
 import com.shermanrex.weatherapp.jetpack.weatherapp.util.WeatherIconFinder
 import kotlin.math.roundToInt
 
@@ -43,12 +46,14 @@ fun DetailBottomSheet(
     onDismiss: () -> Unit,
     sheetState: SheetState,
     ForecastData: ForecastData,
+    modifier: Modifier = Modifier
 ) {
 
     ModalBottomSheet(
         onDismissRequest = { onDismiss.invoke() },
         shape = RoundedCornerShape(topEnd = 15.dp, topStart = 15.dp),
-        sheetState = sheetState
+        sheetState = sheetState,
+        modifier = modifier.fillMaxSize()
     ) {
         Column(
             verticalArrangement = Arrangement.Top,
@@ -103,7 +108,7 @@ private fun BottomSheetLayout(ForecastData: ForecastData) {
                     SpanStyle(
                         color = MaterialTheme.colorScheme.onSecondary,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
+                        fontSize = 28.sp,
                     ),
                     block = { append(ForecastData.temp.roundToInt().toString() + "°") }
                 )
@@ -153,7 +158,7 @@ private fun BottomSheetLayout(ForecastData: ForecastData) {
         }
         LazyVerticalGrid(columns = GridCells.Fixed(2), Modifier.heightIn(max = 1000.dp), content = {
 
-            val index: String = when (ForecastData.uv.roundToInt()) {
+            val uvIndex: String = when (ForecastData.uv.roundToInt()) {
                 1, 2 -> "No protection is needed"
                 in 3..5 -> "Use protection "
                 6, 7 -> "Protection is necessary"
@@ -161,7 +166,7 @@ private fun BottomSheetLayout(ForecastData: ForecastData) {
                 else -> "very harmful"
             }
             val chanceofrain: String = when (ForecastData.precip.roundToInt()) {
-                in 0..20 -> "No chance for rain today"
+                in 0..20 -> "No chance for rain"
                 in 30..50 -> "maybe you should expected rain"
                 in 80..100 -> "You should expected rain"
                 else -> {
@@ -170,64 +175,80 @@ private fun BottomSheetLayout(ForecastData: ForecastData) {
             }
 
             item {
-                BottomSheetGridLayout(
+                DetailGridItem(
                     icon = R.drawable.icon_uv_index,
-                    Headline = "Uv Index",
-                    Value = ForecastData.uv.roundToInt().toString(),
-                    Desc = index
+                    iconDescription = "Uv Index",
+                    value = ForecastData.uv.roundToInt().toString(),
+                    textColor = MaterialTheme.colorScheme.onSecondary,
+                    backgroundColor = Color.Transparent,
+                    Description = uvIndex
                 )
             }
             item {
-                BottomSheetGridLayout(
+                DetailGridItem(
                     icon = R.drawable.icon_humidity,
-                    Headline = "Humidity",
-                    Value = ForecastData.rh.toString() + " %",
+                    iconDescription = "Humidity",
+                    value = ForecastData.rh.toString() + " %",
+                    textColor = MaterialTheme.colorScheme.onSecondary,
+                    backgroundColor = Color.Transparent
                 )
             }
             item {
-                BottomSheetGridLayout(
+                DetailGridItem(
                     icon = R.drawable.icon_pressure,
-                    Headline = "Pressure",
-                    Value = ForecastData.pres.roundToInt().toString() + " mb",
+                    iconDescription = "Pressure",
+                    value = ForecastData.pres.roundToInt().toString() + " mb",
+                    textColor = MaterialTheme.colorScheme.onSecondary,
+                    backgroundColor = Color.Transparent
                 )
             }
 
             item {
-                BottomSheetGridLayout(
+                DetailGridItem(
                     icon = R.drawable.icon_cloud,
-                    Headline = "Cloud",
-                    Value = ForecastData.clouds.toString(),
+                    iconDescription = "Cloud",
+                    value = ForecastData.clouds.toString(),
+                    textColor = MaterialTheme.colorScheme.onSecondary,
+                    backgroundColor = Color.Transparent
                 )
             }
             item {
-                BottomSheetGridLayout(
-                    icon = R.drawable.icon_probabilityofprecipitation,
-                    Headline = "Probability of Precipitation",
-                    Value = ForecastData.pop.toString(),
-                    Desc = chanceofrain
+                DetailGridItem(
+                    icon = R.drawable.rainchance,
+                    iconDescription = "Rain Chance",
+                    value = ForecastData.pop.toString() + " %",
+                    textColor = MaterialTheme.colorScheme.onSecondary,
+                    backgroundColor = Color.Transparent,
+                    Description = chanceofrain
                 )
             }
             item {
-                BottomSheetGridLayout(
+                DetailGridItem(
                     icon = R.drawable.precipitation,
-                    Headline = "Precipitation",
-                    Value = ForecastData.precip.roundToInt().toString() + " mm",
+                    iconDescription = "Precipitation",
+                    value = ForecastData.precip.roundToInt().toString() + " mm",
+                    textColor = MaterialTheme.colorScheme.onSecondary,
+                    backgroundColor = Color.Transparent
                 )
             }
 
             item {
-                BottomSheetGridLayout(
+                DetailGridItem(
                     icon = R.drawable.icon_visibility,
-                    Headline = "Visibility",
-                    Value = ForecastData.vis.roundToInt().toString() + " Km",
+                    iconDescription = "Visibility",
+                    value = (ForecastData.vis.roundToInt()).div(1000).toString() + " Km",
+                    textColor = MaterialTheme.colorScheme.onSecondary,
+                    backgroundColor = Color.Transparent
                 )
             }
 
             item {
-                BottomSheetGridLayout(
+                DetailGridItem(
                     icon = R.drawable.icon_wind_speed,
-                    Headline = "Wind Speed",
-                    Value = ForecastData.wind_spd.roundToInt().toString() + " m/s",
+                    iconDescription = "Wind Speed",
+                    value = ForecastData.wind_spd.roundToInt().toString() + " m/s",
+                    textColor = MaterialTheme.colorScheme.onSecondary,
+                    backgroundColor = Color.Transparent
                 )
             }
 

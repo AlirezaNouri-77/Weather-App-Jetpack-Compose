@@ -34,7 +34,8 @@ fun ThreehourForccast(data: ThreeHourWeatherModel) {
     Card(
         Modifier.padding(top = 5.dp  , start = 10.dp, end = 10.dp) ,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3F)
+            containerColor = MaterialTheme.colorScheme.onBackground
+          //  containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3F)
         )
     ) {
         Text(

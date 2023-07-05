@@ -1,27 +1,18 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -30,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shermanrex.weatherapp.jetpack.weatherapp.Constant.Constant.CELSIUS_SYMBOL
 import com.shermanrex.weatherapp.jetpack.weatherapp.Constant.Constant.FAHRENHEIT_SYMBOL
-import com.shermanrex.weatherapp.jetpack.weatherapp.R
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.CurrentWeatherModel
+import java.util.Locale
 import kotlin.math.roundToInt
 
 @Composable
@@ -70,7 +61,14 @@ fun CurrentWeather(
                 text = data.name,
                 fontWeight = FontWeight.Light,
                 fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = Color.White
+            )
+
+            Text(
+                text = countryCodeToName(data.sys.country),
+                fontWeight = FontWeight.Light,
+                fontSize = 16.sp,
+                color = Color.White,
             )
 
             Row(
@@ -80,7 +78,7 @@ fun CurrentWeather(
 
                 Text(
                     text = "Lat: ${data.coord.lat}",
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.White,
                     fontSize = 12.sp
                 )
 
@@ -88,7 +86,7 @@ fun CurrentWeather(
 
                 Text(
                     text = "Lon: ${data.coord.lon}",
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.White,
                     fontSize = 12.sp
                 )
 
@@ -98,7 +96,7 @@ fun CurrentWeather(
                 withStyle(SpanStyle(
                     fontSize = 54.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = Color.White
                 ), block = {
                     append(data.main.temp.roundToInt().toString() + degreeUnit)
                 })
@@ -108,7 +106,7 @@ fun CurrentWeather(
                 text = data.weather[0].description,
                 fontWeight = FontWeight.Light,
                 fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = Color.White
             )
 
             Row(
@@ -119,7 +117,7 @@ fun CurrentWeather(
                     withStyle(SpanStyle(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Light,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = Color.White
                     ), block = {
                         append("H: ${data.main.temp_max.roundToInt()}°")
                     })
@@ -131,7 +129,7 @@ fun CurrentWeather(
                     withStyle(SpanStyle(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Light,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = Color.White
                     ), block = {
                         append("L: ${data.main.temp_min.roundToInt()}°")
                     })
@@ -141,7 +139,7 @@ fun CurrentWeather(
 
             Text(
                 text =  "More Detail" ,
-                color = MaterialTheme.colorScheme.onPrimary ,
+                color = Color.White ,
                 fontSize = 15.sp ,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.clickable {
@@ -152,80 +150,8 @@ fun CurrentWeather(
     }
 }
 
-//@Composable
-//fun DetailCurrent(
-//    icon: Int,
-//    description: String,
-//    value: String,
-//    valuedescription: String = ""
-//) {
-//    Column(
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.Center
-//        ) {
-//            Image(
-//                painter = painterResource(id = icon),
-//                contentDescription = "",
-//                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-//            )
-//            Text(
-//                text = description,
-//                color = MaterialTheme.colorScheme.onPrimary,
-//                fontWeight = FontWeight.Medium,
-//                fontSize = 18.sp
-//            )
-//        }
-//        Text(
-//            text = "$value  $valuedescription",
-//            color = MaterialTheme.colorScheme.onPrimary,
-//            fontWeight = FontWeight.Light,
-//            fontSize = 15.sp
-//        )
-//    }
-//}
-//
-//@Composable
-//fun DetailGird() {
-//    Card(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .heightIn(min = 100.dp)
-//            .padding(10.dp)
-//    ) {
-//        Column(
-//            verticalArrangement = Arrangement.Center,
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            modifier = Modifier.fillMaxSize()
-//        ) {
-//            Row(
-//                horizontalArrangement = Arrangement.Start
-//            ) {
-//                Image(
-//                    painter = painterResource(id = R.drawable.icon_pressure),
-//                    contentDescription = "",
-//                    Modifier
-//                        .size(20.dp)
-//                        .padding(start = 5.dp, top = 5.dp),
-//                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
-//                    contentScale = ContentScale.Fit
-//                )
-//                Text(
-//                    text = "Pressure",
-//                    Modifier.padding(start = 10.dp, end = 5.dp),
-//                    color = MaterialTheme.colorScheme.onPrimary
-//                )
-//            }
-//            Text(
-//                text = "10",
-//                color = MaterialTheme.colorScheme.onPrimary,
-//                fontSize = 16.sp,
-//                fontWeight = FontWeight.SemiBold
-//            )
-//        }
-//    }
-//}
+fun countryCodeToName(CountyCode:String):String{
+    return Locale("EN" , CountyCode ).displayCountry.toString()
+}
+
 

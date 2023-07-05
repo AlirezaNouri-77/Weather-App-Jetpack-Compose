@@ -1,10 +1,10 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent
 
 import androidx.compose.foundation.clickable
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -20,7 +20,7 @@ fun UnitDegreeSymbol(currentDegree: String, onclick: () -> Unit) {
             SpanStyle(
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (ismetric(currentDegree)) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onPrimary.copy(
+                color = if (ismetric(currentDegree)) Color.White else Color.White.copy(
                     0.5f
                 )
             ),
@@ -32,7 +32,7 @@ fun UnitDegreeSymbol(currentDegree: String, onclick: () -> Unit) {
             SpanStyle(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = Color.White
             ),
             block = {
                 append(" / ")
@@ -42,9 +42,9 @@ fun UnitDegreeSymbol(currentDegree: String, onclick: () -> Unit) {
             SpanStyle(
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (ismetric(currentDegree)) MaterialTheme.colorScheme.onPrimary.copy(
+                color = if (ismetric(currentDegree)) Color.White.copy(
                     0.5f
-                ) else MaterialTheme.colorScheme.onPrimary
+                ) else Color.White
             ),
             block = {
                 append(Constant.FAHRENHEIT_SYMBOL)

@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.repository.WeatherRepository
-import com.shermanrex.weatherapp.jetpack.weatherapp.util.locationPermission
-import com.shermanrex.weatherapp.jetpack.weatherapp.util.myDataStore
+import com.shermanrex.weatherapp.jetpack.weatherapp.util.LocationUtil
+import com.shermanrex.weatherapp.jetpack.weatherapp.datastore.MyDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
@@ -18,43 +18,65 @@ import javax.inject.Inject
 class WeatherViewModel @Inject constructor(
 
     private var WeatherRepository: WeatherRepository,
-    private var myDataStore: myDataStore,
-    private var locationPermission: locationPermission,
+    private var myDataStore: MyDataStore,
+    private var LocationUtil: LocationUtil,
 
     ) : ViewModel() {
 
-    fun callWeatherRepository(lat: Double = 0.0, lon: Double = 0.0, unit: String = "") =
+
+    fun callWeatherRepositorySearchScreen(lat: Double = 0.0, lon: Double = 0.0) {
         viewModelScope.launch {
+            WeatherRepository.callWeatherApi(
+                lat,
+                lon,
+                myDataStore.getUnitDataStore
+            )
+        }
+    }
 
-            val dataStore = myDataStore.dataStoreFlow().stateIn(viewModelScope).value
+    fun callWeatherRepositoryWhenAppLaunch() = viewModelScope.launch {
 
-            // Check if location permission is granted use gps for get coordinator
-            if (lat != 0.0) {
-                WeatherRepository.getCurrent(
-                    lat,
-                    lon,
-                    myDataStore.unitFlow
-                )
-                // if permission is not granted and search in search page for coordinator
-            } else if (locationPermission.isPermissionGranted()) {
-                withContext(Dispatchers.Default) {
-                    WeatherRepository.getCurrent(
-                        locationPermission.getLocationCoordinator()[0].lat!!,
-                        locationPermission.getLocationCoordinator()[0].lon!!,
-                        myDataStore.unitFlow
-                    )
+           val dataStore = myDataStore.dataStoreFlow().stateIn(viewModelScope).value
+
+           if (LocationUtil.isPermissionGranted()) {
+                if (LocationUtil.checkLocation()) {
+                    withContext(Dispatchers.Default) {
+                        WeatherRepository.callWeatherApi(
+                            LocationUtil.getLocationCoordinator()[0].lat!!,
+                            LocationUtil.getLocationCoordinator()[0].lon!!,
+                            myDataStore.getUnitDataStore
+                        )
+                    }
+                } else {
+                    WeatherRepository._WeatherReponseError.value = ResponseResultModel.LocationNotOn
                 }
                 // if above two statements is not ture which mean user before call and coordinator save in datastore
             } else if (dataStore.lat != 0.0) {
-                WeatherRepository.getCurrent(dataStore.lat, dataStore.lon, myDataStore.unitFlow)
+                WeatherRepository.callWeatherApi(dataStore.lat, dataStore.lon, myDataStore.getUnitDataStore)
                 // When app launch First Time
-            } else if (!locationPermission.isPermissionGranted()) {
-                WeatherRepository.setWeatherResposneResult()
+            } else if (!LocationUtil.isPermissionGranted()) {
+                weatherApiResponseToEmpty()
             }
         }
 
     fun weatherApiResponse(): StateFlow<ResponseResultModel> {
         return WeatherRepository.WeatherResponse
+    }
+
+    fun weatherApiResponseToidle() {
+        WeatherRepository._WeatherReponse.value = ResponseResultModel.Idle
+    }
+
+    fun weatherApiResponseToEmpty() {
+        WeatherRepository._WeatherReponse.value = ResponseResultModel.Empty
+    }
+
+    fun weatherApiResponseErrorToidle() {
+        WeatherRepository._WeatherReponseError.value = ResponseResultModel.Idle
+    }
+
+    fun weatherApiResponseError(): StateFlow<ResponseResultModel> {
+        return WeatherRepository.WeatherResponseError
     }
 
     fun updateCoordinatorDataStore(lat: Double = 0.0, lon: Double = 0.0) =
@@ -66,8 +88,8 @@ class WeatherViewModel @Inject constructor(
         myDataStore.writeUnitDataStore(unit)
     }
 
-    fun getWeatherUnitDataStore(): String  {
-        return myDataStore.unitFlow
+    fun getWeatherUnitDataStore(): String {
+        return myDataStore.getUnitDataStore
     }
 
 }
