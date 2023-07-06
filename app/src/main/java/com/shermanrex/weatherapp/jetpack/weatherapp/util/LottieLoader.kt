@@ -30,7 +30,7 @@ fun LottieLoader() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp),
+            .height(80.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

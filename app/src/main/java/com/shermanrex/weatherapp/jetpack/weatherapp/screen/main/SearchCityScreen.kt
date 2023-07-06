@@ -50,6 +50,7 @@ import com.shermanrex.weatherapp.jetpack.weatherapp.util.LottieLoader
 import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.SearchViewModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.WeatherViewModel
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -63,7 +64,8 @@ fun SearchCityScreen(
     weatherViewModel: WeatherViewModel
 ) {
 
-    val stateSearchCityApi = searchViewModel.searchCityApiResponse().collectAsStateWithLifecycle().value
+    val stateSearchCityApi =
+        searchViewModel.searchCityApiResponse().collectAsStateWithLifecycle().value
 
     var textFieldChangeValue by remember {
         mutableStateOf("")
@@ -78,7 +80,7 @@ fun SearchCityScreen(
             textFieldChangeValue
         }.debounce(1500L).distinctUntilChanged().collectLatest {
             if (it.length >= 2) {
-                searchViewModel.callSearchCityApi(it)
+                searchViewModel.callSearchCityApi(it.trim().lowercase())
             }
         }
     })
@@ -99,7 +101,7 @@ fun SearchCityScreen(
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "",
-                                tint = MaterialTheme.colorScheme.onPrimary
+                                // tint = Color.White
                             )
                         }
                     })
@@ -112,7 +114,7 @@ fun SearchCityScreen(
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "",
-                                tint = MaterialTheme.colorScheme.onPrimary
+                                //   tint = Color.White
                             )
                         }
                     }
@@ -121,19 +123,21 @@ fun SearchCityScreen(
                     .fillMaxWidth()
                     .height(60.dp),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.primary,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = MaterialTheme.colorScheme.primary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary,
-                    focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
+                    focusedContainerColor = Color(0xFF004e92),
+                    unfocusedContainerColor = Color(0xFF004e92),
+                    cursorColor = Color.White,
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedPlaceholderColor = Color.White.copy(alpha = 0.6F),
+                    focusedTrailingIconColor = Color.White,
+                    focusedLeadingIconColor = Color.White,
+                    unfocusedPlaceholderColor = Color.White.copy(alpha = 0.6F),
+                    unfocusedTrailingIconColor = Color.White,
+                    unfocusedLeadingIconColor = Color.White
                 ),
                 placeholder = {
                     Text(
                         text = "Enter a City Name",
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6F),
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -196,7 +200,11 @@ fun SearchCityScreen(
                                         stateSearchCityApi.data[index].lon.toDouble(),
                                     )
                                     navController.navigate(NavControllerModel.MainApp.Route)
-                                }, colors = ListItemDefaults.colors(overlineColor = Color.Black)
+                                },
+                                colors = ListItemDefaults.colors(
+                                    overlineColor = Color.Black,
+                                    containerColor = Color.Transparent
+                                )
                             )
                         }
                     }
@@ -207,6 +215,7 @@ fun SearchCityScreen(
                 }
 
                 is ResponseResultModel.Error -> {
+                    isplayingLottie = false
                     LazyColumn {
                         item {
                             ListItem(
@@ -215,8 +224,10 @@ fun SearchCityScreen(
                                         text = stateSearchCityApi.error,
                                         fontWeight = FontWeight.SemiBold
                                     )
-                                }
-                            )
+                                }, colors = ListItemDefaults.colors(
+                                    overlineColor = Color.Black,
+                                    containerColor = Color.Transparent
+                                ))
                         }
                     }
                 }

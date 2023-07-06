@@ -1,6 +1,5 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent
 
-import android.content.res.Configuration
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -19,36 +18,37 @@ import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.WeatherChartModel
-import com.shermanrex.weatherapp.jetpack.weatherapp.ui.theme.WeatherAppTheme
 import com.shermanrex.weatherapp.jetpack.weatherapp.util.timeStampFormatter
 import kotlin.math.roundToInt
 
 @Composable
 fun WeatherChart(
-    data: List<WeatherChartModel> = emptyList()
+    datalist: List<WeatherChartModel> = emptyList(),
+    uppervalue:Double,
+    lowervalue:Double,
+    chartColor: List<Color> = emptyList()
 ) {
 
     val timeStampFormatter by lazy {
         timeStampFormatter()
     }
 
-    val inputList: MutableList<WeatherChartModel> = data as MutableList<WeatherChartModel>
+    val inputList: MutableList<WeatherChartModel> = datalist as MutableList<WeatherChartModel>
 
     val chartSpacer = 100f
 
-    val uppervalue = remember(inputList) {
-        inputList.maxOfOrNull { it.value } ?: 0.0
-    }
+//    var uppervalue = remember(inputList) {
+//        inputList.maxOfOrNull { it.value } ?: 0.0
+//    }
+//
+//    var lowervalue = remember(inputList) {
+//        inputList.minOfOrNull { it.value } ?: 0.0
+//    }
 
-    val colorChart = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.8f)
-
-    val lowervalue = remember(inputList) {
-        inputList.minOfOrNull { it.value } ?: 0.0
-    }
+    val textColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.8f)
 
     val valueStep = remember(inputList) {
         (uppervalue - lowervalue) / 5f
@@ -57,17 +57,21 @@ fun WeatherChart(
     val density = LocalDensity.current
     val textPaint = remember(density) {
         Paint().apply {
-            color = colorChart.toArgb()
+            color = textColor.toArgb()
             textSize = density.run { 12.sp.toPx() }
         }
     }
 
-    Box(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(10.dp)) {
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp)
         ) {
+
 
             val spacerPerDate = (size.width - chartSpacer) / inputList.size
             val spacerPerValue = (size.height - chartSpacer) / 6f
@@ -133,37 +137,11 @@ fun WeatherChart(
             drawPath(
                 fill,
                 brush = Brush.verticalGradient(
-                        colors = listOf(
-                            colorChart,
-                            Color.Transparent
-                        ),
+                        colors = chartColor,
                     endY = size.height - chartSpacer
                 ),
             )
 
-        }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_UNDEFINED, showBackground = true)
-@Preview(name = "Full Preview", showSystemUi = true)
-@Composable
-fun PreviewMychart() {
-    WeatherAppTheme() {
-        Box(Modifier.fillMaxWidth()) {
-            WeatherChart(
-                data = listOf(
-                    WeatherChartModel(10000000, 34.0),
-                    WeatherChartModel(10000000, 36.0),
-                    WeatherChartModel(10000000, 38.0),
-                    WeatherChartModel(10000000, 39.0),
-                    WeatherChartModel(10000000, 37.0),
-                    WeatherChartModel(10000000, 40.0),
-                    WeatherChartModel(10000000, 33.0),
-                )
-            )
         }
     }
 }

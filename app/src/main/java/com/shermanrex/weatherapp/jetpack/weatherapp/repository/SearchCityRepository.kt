@@ -1,6 +1,7 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.repository
 
 import android.content.Context
+import android.util.Log
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.SearchCityApiModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.retrofit.RetrofitService
@@ -44,18 +45,18 @@ class SearchCityRepository @Inject constructor(
         _SearchApiResultStateflow.value = ResponseResultModel.Loading
 
         val response = retrofit.getSearchApi(
-            cityName = cityname.lowercase()
+            cityName = cityname
         )
         withContext(Dispatchers.IO) {
             when {
-                response.body().toString().isEmpty() -> {
-                    _SearchApiResultStateflow.value =
-                        ResponseResultModel.Error("Nothing Found! Please try again")
-                }
-
                 response.isSuccessful -> {
-                    _SearchApiResultStateflow.value =
-                        ResponseResultModel.SearchSuccess(response.body() as SearchCityApiModel)
+                    if (response.body()!!.isNotEmpty()){
+                        _SearchApiResultStateflow.value =
+                            ResponseResultModel.SearchSuccess(response.body() as SearchCityApiModel)
+                    } else {
+                        _SearchApiResultStateflow.value =
+                            ResponseResultModel.Error("Nothing Found! Please try again")
+                    }
                 }
 
                 !response.isSuccessful -> {
@@ -63,7 +64,6 @@ class SearchCityRepository @Inject constructor(
                         ResponseResultModel.Error(response.message())
                 }
             }
-
         }
     }
 }

@@ -52,7 +52,7 @@ import kotlin.math.roundToInt
 @Composable
 fun SevenDayForecast(data: SevenDayForecastModel) {
 
-    val WeatherIconFinder by lazy {
+    val weatherIconFinder by lazy {
         WeatherIconFinder()
     }
 
@@ -60,7 +60,7 @@ fun SevenDayForecast(data: SevenDayForecastModel) {
         mutableStateOf(false)
     }
 
-    val bottomState = rememberModalBottomSheetState()
+    val bottomState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     if (showBottomSheetChart) {
         ChartBottomSheet(
@@ -114,7 +114,7 @@ fun SevenDayForecast(data: SevenDayForecastModel) {
                 if (index != 0) {
                     SevenDayForeCastListItem(
                         ForecastData = item,
-                        WeatherIconFinder = WeatherIconFinder,
+                        WeatherIconFinder = weatherIconFinder,
                     )
                 }
             }

@@ -1,12 +1,19 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.bottomsheet
 
+import android.graphics.Color.BLUE
+import android.graphics.Color.CYAN
+import android.graphics.Color.TRANSPARENT
+import android.graphics.Color.YELLOW
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -18,10 +25,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.shermanrex.weatherapp.jetpack.weatherapp.R
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.ForecastData
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.WeatherChartModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent.ChartChips
@@ -34,7 +45,6 @@ fun ChartBottomSheet(
     onDismiss: () -> Unit,
     sheetState: SheetState,
     ForecastData: List<ForecastData>,
-    modifier: Modifier = Modifier
 ) {
 
     val weatherChartEnum = remember {
@@ -45,6 +55,7 @@ fun ChartBottomSheet(
     val maxtempList: MutableList<WeatherChartModel> = mutableListOf()
     val mintempList: MutableList<WeatherChartModel> = mutableListOf()
     val rainList: MutableList<WeatherChartModel> = mutableListOf()
+    val uvindex: MutableList<WeatherChartModel> = mutableListOf()
 
     for (i in 1 until ForecastData.size) {
         tempList.add(
@@ -53,16 +64,18 @@ fun ChartBottomSheet(
                 ForecastData[i].temp
             )
         )
-    }
-    for (i in 1 until ForecastData.size) {
+        uvindex.add(
+            WeatherChartModel(
+                ForecastData[i].ts.toLong(),
+                ForecastData[i].uv
+            )
+        )
         maxtempList.add(
             WeatherChartModel(
                 ForecastData[i].ts.toLong(),
                 ForecastData[i].max_temp
             )
         )
-    }
-    for (i in 1 until ForecastData.size) {
         mintempList.add(
             WeatherChartModel(
                 ForecastData[i].ts.toLong(),
@@ -70,15 +83,39 @@ fun ChartBottomSheet(
             )
         )
     }
-
-    for (i in 1 until ForecastData.size) {
-        rainList.add(
-            WeatherChartModel(
-                ForecastData[i].ts.toLong(),
-                ForecastData[i].pop.toDouble()
-            )
-        )
-    }
+//    for (i in 1 until ForecastData.size) {
+//        uvindex.add(
+//            WeatherChartModel(
+//                ForecastData[i].ts.toLong(),
+//                ForecastData[i].uv
+//            )
+//        )
+//    }
+//    for (i in 1 until ForecastData.size) {
+//        maxtempList.add(
+//            WeatherChartModel(
+//                ForecastData[i].ts.toLong(),
+//                ForecastData[i].max_temp
+//            )
+//        )
+//    }
+//    for (i in 1 until ForecastData.size) {
+//        mintempList.add(
+//            WeatherChartModel(
+//                ForecastData[i].ts.toLong(),
+//                ForecastData[i].min_temp
+//            )
+//        )
+//    }
+//
+//    for (i in 1 until ForecastData.size) {
+//        rainList.add(
+//            WeatherChartModel(
+//                ForecastData[i].ts.toLong(),
+//                ForecastData[i].pop.toDouble()
+//            )
+//        )
+//    }
 
     ModalBottomSheet(
         onDismissRequest = { onDismiss.invoke() },
@@ -100,36 +137,93 @@ fun ChartBottomSheet(
             AnimatedContent(targetState = weatherChartEnum.value) { item ->
                 when (item) {
                     WeatherChartEnum.AverageTemp -> {
-                        WeatherChart(tempList)
+                        WeatherChart(
+                            datalist = tempList,
+                            chartColor = listOf(
+                                Color(android.graphics.Color.GREEN).copy(alpha = 0.6f),
+                                Color(TRANSPARENT)
+                            ),
+                            uppervalue = tempList.maxOfOrNull { it.value } ?: 0.0,
+                            lowervalue = tempList.minOfOrNull { it.value } ?: 0.0
+                        )
                     }
 
                     WeatherChartEnum.MinTemp -> {
-                        WeatherChart(maxtempList)
+                        WeatherChart(
+                            datalist = mintempList,
+                            chartColor = listOf(
+                                Color(CYAN).copy(alpha = 0.6f),
+                                Color(TRANSPARENT)
+                            ),
+                            uppervalue = mintempList.maxOfOrNull { it.value } ?: 0.0,
+                            lowervalue = mintempList.minOfOrNull { it.value } ?: 0.0
+                        )
                     }
 
                     WeatherChartEnum.MaxTemp -> {
-                        WeatherChart(mintempList)
+                        WeatherChart(
+                            datalist = maxtempList,
+                            chartColor = listOf(
+                                Color(android.graphics.Color.RED).copy(alpha = 0.6f),
+                                Color(TRANSPARENT)
+                            ),
+                            uppervalue = maxtempList.maxOfOrNull { it.value } ?: 0.0,
+                            lowervalue = maxtempList.minOfOrNull { it.value } ?: 0.0
+                        )
                     }
 
                     WeatherChartEnum.Rain -> {
                         val lower = rainList.minOfOrNull { it.value } ?: 0.0
                         val upper = rainList.maxOfOrNull { it.value } ?: 0.0
                         if (lower.plus(upper) == 0.0) {
-                            Text(
-                                text = " No chance for raining in forward 6 day :(",
-                                color = MaterialTheme.colorScheme.onSecondary,
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier
-                                    .height(300.dp)
-                                    .fillMaxWidth(),
-                                textAlign = TextAlign.Center
-                            )
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.height(300.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.icon_nochancerain),
+                                    contentDescription = null,
+                                    Modifier
+                                        .size(70.dp)
+                                        .padding(10.dp),
+                                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+                                )
+                                Text(
+                                    text = " No chance for raining in forward 6 day :(",
+                                    color = MaterialTheme.colorScheme.onSecondary,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         } else {
-                            WeatherChart(rainList)
+                            WeatherChart(
+                                datalist = rainList,
+                                chartColor = listOf(
+                                    Color(0xFF0197F6),
+                                    Color(TRANSPARENT)
+                                ),
+                                uppervalue = 100.0,
+                                lowervalue = 0.0
+                            )
                         }
 
                     }
+
+                    WeatherChartEnum.UVindex -> {
+                        WeatherChart(
+                            datalist = uvindex,
+                            chartColor = listOf(
+                                Color(YELLOW),
+                                Color(TRANSPARENT)
+                            ),
+                            uppervalue = 11.0,
+                            lowervalue = 0.0
+                        )
+                    }
+
+                    else -> {}
                 }
             }
         }

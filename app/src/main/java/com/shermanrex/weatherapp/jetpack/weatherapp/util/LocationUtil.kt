@@ -35,8 +35,13 @@ class LocationUtil @Inject constructor(
     fun getLocationCoordinator(): MutableList<LocationCoordinator> {
         val list:MutableList<LocationCoordinator> = mutableListOf()
         list.clear()
-        val check = ContextCompat.checkSelfPermission(context,Manifest.permission.ACCESS_COARSE_LOCATION)
-        if (check==PackageManager.PERMISSION_GRANTED){
+        val test = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+            ContextCompat.checkSelfPermission(context,Manifest.permission.ACCESS_COARSE_LOCATION)
+        }else {
+            ContextCompat.checkSelfPermission(context,Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+
+        if (test==PackageManager.PERMISSION_GRANTED){
             val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
             list.add(
                 LocationCoordinator(

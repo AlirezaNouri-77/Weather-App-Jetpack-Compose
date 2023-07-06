@@ -1,11 +1,19 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -22,10 +30,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChartChips(
     onClick: (WeatherChartEnum) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier
 ) {
 
     val chartList = listOf(
@@ -33,16 +42,19 @@ fun ChartChips(
         Pair(WeatherChartEnum.MaxTemp, "Max Temp"),
         Pair(WeatherChartEnum.MinTemp, "Min Temp"),
         Pair(WeatherChartEnum.Rain, "Rain"),
+        Pair(WeatherChartEnum.UVindex, "Uv index")
     )
 
     val isCheck = remember {
         mutableStateOf(0)
     }
 
-    LazyRow(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-        contentPadding = PaddingValues(10.dp)
+    LazyHorizontalStaggeredGrid(
+        rows = StaggeredGridCells.Fixed(2),
+        verticalArrangement = Arrangement.Center,
+        horizontalItemSpacing = 2.dp,
+        contentPadding = PaddingValues(5.dp),
+        modifier = Modifier.height(100.dp).fillMaxWidth()
     ) {
 
         itemsIndexed(chartList) { index, item ->
@@ -51,13 +63,12 @@ fun ChartChips(
                 onClickButton = {
                     isCheck.value = index
                     onClick.invoke(item.first)
-                                },
+                },
                 index = index,
                 isCheckIndex = isCheck.value
             )
         }
     }
-
 }
 
 @Composable
@@ -71,22 +82,21 @@ fun ChartChipsItem(
     Button(
         onClick = { onClickButton.invoke() },
         shape = RoundedCornerShape(15.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.6f)),
-        modifier = Modifier.padding(5.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.5f)),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isCheckIndex == index) MaterialTheme.colorScheme.onSecondary else Color.Transparent,
+            containerColor = if (isCheckIndex == index) Color(0xFF004e92) else Color.Transparent,
         )
     ) {
         Text(
             text = chipsText,
             textAlign = TextAlign.Center,
-            fontSize = 12.sp,
-            color = if (isCheckIndex == index) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.secondaryContainer,
+            fontSize = 13.sp,
+            color = if (isCheckIndex == index) Color.White else MaterialTheme.colorScheme.onPrimary,
             fontWeight = FontWeight.SemiBold
         )
     }
 }
 
 enum class WeatherChartEnum {
-    AverageTemp , MaxTemp , MinTemp , Rain
+    AverageTemp, MaxTemp, MinTemp, Rain, UVindex
 }
