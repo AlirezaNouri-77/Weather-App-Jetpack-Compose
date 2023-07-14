@@ -1,6 +1,6 @@
 # **Jetpack Compose Weather App**
 
-My weather app, built with Kotlin, use jetpack compose and material 3 for design.
+My weather app, built with Kotlin, use **jetpack compose** and material 3 for design.
 
 
 ### Technology
@@ -10,7 +10,6 @@ My weather app, built with Kotlin, use jetpack compose and material 3 for design
 - coroutine to handle asychronouse task
 - Gson for JSON serialization
 - Navigation
-- Retrofit
-- okhttp for network interceptor
+- Retrofit use alongside okhttp for network interceptor
 
-For weather data, I use Weatherbit and openweathermap api
+For weather data, I use Weatherbit and Openweathermap api
