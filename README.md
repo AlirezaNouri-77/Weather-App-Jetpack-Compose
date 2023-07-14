@@ -15,6 +15,6 @@ My weather app, built with Kotlin, use **jetpack compose** and material 3 for de
 
 For weather data, I use Weatherbit and Openweathermap api
 
-<img src="https://github.com/AlirezaNouri-77/Weather-App-Jetpack-Compose/assets/71293106/c51512fe-d55d-4c73-bd86-c468872b3d27" width=25% height=25%>
-<img src="https://github.com/AlirezaNouri-77/Weather-App-Jetpack-Compose/assets/71293106/2831c0ac-2d46-4b55-8a89-c68779d1339d" width=25% height=25%>
-<img src="https://github.com/AlirezaNouri-77/Weather-App-Jetpack-Compose/assets/71293106/7ae12325-b64a-4e64-bfbd-906a0a72335a" width=25% height=25%>
+<img src="https://github.com/AlirezaNouri-77/Weather-App-Jetpack-Compose/assets/71293106/cb71bb09-32f7-4b8b-a68d-45e41e6fc553" width=25% height=25%>
+<img src="https://github.com/AlirezaNouri-77/Weather-App-Jetpack-Compose/assets/71293106/c007533d-b4d5-40d1-8858-233aa07a22c5" width=25% height=25%>
+<img src="https://github.com/AlirezaNouri-77/Weather-App-Jetpack-Compose/assets/71293106/8ff72384-487e-4c1d-b7bb-d156bef297b1" width=25% height=25%>
