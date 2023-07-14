@@ -7,7 +7,6 @@ import androidx.activity.viewModels
 import androidx.navigation.compose.rememberNavController
 import com.shermanrex.weatherapp.jetpack.weatherapp.navigation.MyNavController
 import com.shermanrex.weatherapp.jetpack.weatherapp.ui.theme.WeatherAppTheme
-import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.SearchViewModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.WeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -18,7 +17,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             WeatherAppTheme {
                 val weatherViewModel = viewModels<WeatherViewModel>()
-                weatherViewModel.value.callWeatherRepositoryWhenAppLaunch()
+                weatherViewModel.value.callWeatherRepository()
                 val navController = rememberNavController()
                 MyNavController(navController = navController)
             }

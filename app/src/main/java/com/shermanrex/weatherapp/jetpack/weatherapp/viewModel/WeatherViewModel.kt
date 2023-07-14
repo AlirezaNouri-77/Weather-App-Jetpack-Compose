@@ -19,7 +19,7 @@ class WeatherViewModel @Inject constructor(
 
     private var WeatherRepository: WeatherRepository,
     private var myDataStore: MyDataStore,
-    private var LocationUtil: LocationUtil,
+    private var LocationUtil: LocationUtil
 
     ) : ViewModel() {
 
@@ -34,7 +34,7 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
-    fun callWeatherRepositoryWhenAppLaunch() = viewModelScope.launch {
+    fun callWeatherRepository() = viewModelScope.launch {
 
            val dataStore = myDataStore.dataStoreFlow().stateIn(viewModelScope).value
 
@@ -42,8 +42,8 @@ class WeatherViewModel @Inject constructor(
                 if (LocationUtil.checkLocation()) {
                     withContext(Dispatchers.Default) {
                         WeatherRepository.callWeatherApi(
-                            LocationUtil.getLocationCoordinator()[0].lat!!,
-                            LocationUtil.getLocationCoordinator()[0].lon!!,
+                            LocationUtil.getLocationCoordinator().first().lat!!,
+                            LocationUtil.getLocationCoordinator().first().lon!!,
                             myDataStore.getUnitDataStore
                         )
                     }
@@ -55,7 +55,7 @@ class WeatherViewModel @Inject constructor(
                 WeatherRepository.callWeatherApi(dataStore.lat, dataStore.lon, myDataStore.getUnitDataStore)
                 // When app launch First Time
             } else if (!LocationUtil.isPermissionGranted()) {
-                weatherApiResponseToEmpty()
+               WeatherRepository._WeatherReponse.value = ResponseResultModel.Empty
             }
         }
 
@@ -63,16 +63,8 @@ class WeatherViewModel @Inject constructor(
         return WeatherRepository.WeatherResponse
     }
 
-    fun weatherApiResponseToidle() {
-        WeatherRepository._WeatherReponse.value = ResponseResultModel.Idle
-    }
-
-    fun weatherApiResponseToEmpty() {
-        WeatherRepository._WeatherReponse.value = ResponseResultModel.Empty
-    }
-
-    fun weatherApiResponseErrorToidle() {
-        WeatherRepository._WeatherReponseError.value = ResponseResultModel.Idle
+    fun updateWeatherResponseError(input:ResponseResultModel){
+        WeatherRepository._WeatherReponseError.value = input
     }
 
     fun weatherApiResponseError(): StateFlow<ResponseResultModel> {
@@ -90,6 +82,10 @@ class WeatherViewModel @Inject constructor(
 
     fun getWeatherUnitDataStore(): String {
         return myDataStore.getUnitDataStore
+    }
+
+    fun checkLocationGranted():Boolean{
+        return LocationUtil.isPermissionGranted()
     }
 
 }

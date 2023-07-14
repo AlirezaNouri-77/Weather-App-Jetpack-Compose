@@ -9,16 +9,19 @@ sealed class ResponseResultModel {
     object Empty:ResponseResultModel()
     object NetWork:ResponseResultModel()
     object LocationNotOn:ResponseResultModel()
+    object Location:ResponseResultModel()
 
 }
 
-sealed class ResponseResultModel1<out T> {
-    data class Success<T>(val data: MutableMap<String, T>) : ResponseResultModel()
-    data class SearchSuccess<T>(val data: T) : ResponseResultModel()
-    data class Error<T>(val error: String) : ResponseResultModel()
-    object Idle1 : ResponseResultModel()
-    object Loading : ResponseResultModel()
-    object Empty:ResponseResultModel()
-    object NetWork:ResponseResultModel()
-
-}
+//sealed class ResponseResultModel<out T> {
+//    data class Success<T>(val data: T?) : ResponseResultModel<T>()
+//    data class SearchSuccess<T>(val data: T?) : ResponseResultModel<T>()
+//    data class Error<T>(val error: T?) : ResponseResultModel<T>()
+//    object Idle : ResponseResultModel<Nothing>()
+//    object Loading : ResponseResultModel<Nothing>()
+//    object Empty : ResponseResultModel<Nothing>()
+//    object NetWork : ResponseResultModel<Nothing>()
+//    object LocationNotOn : ResponseResultModel<Nothing>()
+//    object Location : ResponseResultModel<Nothing>()
+//
+//}

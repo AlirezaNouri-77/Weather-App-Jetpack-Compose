@@ -1,6 +1,6 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.models
 
-data class LocationCoordinator(
+data class LocationCoordinatorModel(
     var lat: Double?,
     var lon: Double?
 )

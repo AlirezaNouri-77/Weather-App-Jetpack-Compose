@@ -20,7 +20,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
-
 fun Modifier.shimmerffect(): Modifier = composed {
 
     var size by remember {

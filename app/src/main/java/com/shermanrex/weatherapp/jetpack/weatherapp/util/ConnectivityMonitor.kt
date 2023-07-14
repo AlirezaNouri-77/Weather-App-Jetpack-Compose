@@ -1,12 +1,10 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.util
 
 import android.content.Context
-import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities.TRANSPORT_CELLULAR
 import android.net.NetworkCapabilities.TRANSPORT_ETHERNET
 import android.net.NetworkCapabilities.TRANSPORT_WIFI
-import android.os.Build
 
 class ConnectivityMonitor(
     var context: Context
@@ -16,7 +14,7 @@ class ConnectivityMonitor(
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     fun checkNetworkConnection(): Boolean {
-        var resultNetwork: Boolean
+        val resultNetwork: Boolean
         val networkCapab = connectivtymanager.activeNetwork ?: return false
         val activeNetwork = connectivtymanager.getNetworkCapabilities(networkCapab) ?: return false
 

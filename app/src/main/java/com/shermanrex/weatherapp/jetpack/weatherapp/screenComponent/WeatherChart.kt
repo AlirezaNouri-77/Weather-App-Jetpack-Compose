@@ -40,14 +40,6 @@ fun WeatherChart(
 
     val chartSpacer = 100f
 
-//    var uppervalue = remember(inputList) {
-//        inputList.maxOfOrNull { it.value } ?: 0.0
-//    }
-//
-//    var lowervalue = remember(inputList) {
-//        inputList.minOfOrNull { it.value } ?: 0.0
-//    }
-
     val textColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.8f)
 
     val valueStep = remember(inputList) {
@@ -62,7 +54,6 @@ fun WeatherChart(
         }
     }
 
-
     Box(modifier = Modifier
         .fillMaxWidth()
         .padding(10.dp)) {
@@ -72,10 +63,8 @@ fun WeatherChart(
                 .height(300.dp)
         ) {
 
-
             val spacerPerDate = (size.width - chartSpacer) / inputList.size
             val spacerPerValue = (size.height - chartSpacer) / 6f
-
 
             (inputList.indices).forEach { index ->
                 drawContext.canvas.nativeCanvas.drawText(
@@ -96,7 +85,6 @@ fun WeatherChart(
             }
 
             var lastx = 0f
-
             val strokePath = Path().apply {
 
                 (inputList.indices).forEach { index ->

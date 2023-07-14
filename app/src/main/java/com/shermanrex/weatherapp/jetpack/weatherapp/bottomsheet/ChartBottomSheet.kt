@@ -83,39 +83,7 @@ fun ChartBottomSheet(
             )
         )
     }
-//    for (i in 1 until ForecastData.size) {
-//        uvindex.add(
-//            WeatherChartModel(
-//                ForecastData[i].ts.toLong(),
-//                ForecastData[i].uv
-//            )
-//        )
-//    }
-//    for (i in 1 until ForecastData.size) {
-//        maxtempList.add(
-//            WeatherChartModel(
-//                ForecastData[i].ts.toLong(),
-//                ForecastData[i].max_temp
-//            )
-//        )
-//    }
-//    for (i in 1 until ForecastData.size) {
-//        mintempList.add(
-//            WeatherChartModel(
-//                ForecastData[i].ts.toLong(),
-//                ForecastData[i].min_temp
-//            )
-//        )
-//    }
-//
-//    for (i in 1 until ForecastData.size) {
-//        rainList.add(
-//            WeatherChartModel(
-//                ForecastData[i].ts.toLong(),
-//                ForecastData[i].pop.toDouble()
-//            )
-//        )
-//    }
+
 
     ModalBottomSheet(
         onDismissRequest = { onDismiss.invoke() },
@@ -143,7 +111,7 @@ fun ChartBottomSheet(
                                 Color(android.graphics.Color.GREEN).copy(alpha = 0.6f),
                                 Color(TRANSPARENT)
                             ),
-                            uppervalue = tempList.maxOfOrNull { it.value } ?: 0.0,
+                            uppervalue = tempList.maxOfOrNull { it.value.plus(1) } ?: 0.0,
                             lowervalue = tempList.minOfOrNull { it.value } ?: 0.0
                         )
                     }
@@ -155,7 +123,7 @@ fun ChartBottomSheet(
                                 Color(CYAN).copy(alpha = 0.6f),
                                 Color(TRANSPARENT)
                             ),
-                            uppervalue = mintempList.maxOfOrNull { it.value } ?: 0.0,
+                            uppervalue = mintempList.maxOfOrNull { it.value.plus(1) } ?: 0.0,
                             lowervalue = mintempList.minOfOrNull { it.value } ?: 0.0
                         )
                     }
@@ -167,7 +135,7 @@ fun ChartBottomSheet(
                                 Color(android.graphics.Color.RED).copy(alpha = 0.6f),
                                 Color(TRANSPARENT)
                             ),
-                            uppervalue = maxtempList.maxOfOrNull { it.value } ?: 0.0,
+                            uppervalue = maxtempList.maxOfOrNull { it.value.plus(1) } ?: 0.0,
                             lowervalue = maxtempList.minOfOrNull { it.value } ?: 0.0
                         )
                     }

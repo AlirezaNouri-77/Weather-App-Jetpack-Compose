@@ -52,7 +52,7 @@ fun ChartChips(
     LazyHorizontalStaggeredGrid(
         rows = StaggeredGridCells.Fixed(2),
         verticalArrangement = Arrangement.Center,
-        horizontalItemSpacing = 2.dp,
+        horizontalItemSpacing = 5.dp,
         contentPadding = PaddingValues(5.dp),
         modifier = Modifier.height(100.dp).fillMaxWidth()
     ) {
@@ -82,6 +82,7 @@ fun ChartChipsItem(
     Button(
         onClick = { onClickButton.invoke() },
         shape = RoundedCornerShape(15.dp),
+        modifier = Modifier.padding(5.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.5f)),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (isCheckIndex == index) Color(0xFF004e92) else Color.Transparent,

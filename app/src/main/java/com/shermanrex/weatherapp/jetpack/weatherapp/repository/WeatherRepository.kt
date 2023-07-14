@@ -43,6 +43,7 @@ class WeatherRepository @Inject constructor(
 
         val coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
             _WeatherReponseError.value = ResponseResultModel.Error(throwable.message.toString())
+            Log.d("TAG", "callWeatherApi: " + throwable.message.toString())
         }
 
 

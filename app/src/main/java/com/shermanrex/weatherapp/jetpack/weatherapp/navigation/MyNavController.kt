@@ -5,8 +5,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.shermanrex.weatherapp.jetpack.weatherapp.screen.main.MainApp
-import com.shermanrex.weatherapp.jetpack.weatherapp.screen.main.SearchCityScreen
+import com.shermanrex.weatherapp.jetpack.weatherapp.screens.WeatherScreen
+import com.shermanrex.weatherapp.jetpack.weatherapp.screens.SearchCityScreen
 import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.SearchViewModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.WeatherViewModel
 
@@ -19,7 +19,7 @@ fun MyNavController(navController: NavHostController) {
 
     NavHost(navController = navController, startDestination = NavControllerModel.MainApp.Route) {
         composable(NavControllerModel.MainApp.Route) {
-            MainApp(navController, weatherViewModel)
+            WeatherScreen(navController, weatherViewModel)
         }
         composable(NavControllerModel.SearchCityScreen.Route) {
             SearchCityScreen(navController, searchViewModel, weatherViewModel)

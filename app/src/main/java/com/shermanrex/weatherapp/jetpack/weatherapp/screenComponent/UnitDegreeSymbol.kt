@@ -11,7 +11,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import com.shermanrex.weatherapp.jetpack.weatherapp.Constant.Constant
-import com.shermanrex.weatherapp.jetpack.weatherapp.screen.main.ismetric
 
 @Composable
 fun UnitDegreeSymbol(currentDegree: String, onclick: () -> Unit) {
@@ -20,7 +19,7 @@ fun UnitDegreeSymbol(currentDegree: String, onclick: () -> Unit) {
             SpanStyle(
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (ismetric(currentDegree)) Color.White else Color.White.copy(
+                color = if (currentDegree == "METRIC") Color.White else Color.White.copy(
                     0.5f
                 )
             ),
@@ -42,7 +41,7 @@ fun UnitDegreeSymbol(currentDegree: String, onclick: () -> Unit) {
             SpanStyle(
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (ismetric(currentDegree)) Color.White.copy(
+                color = if (currentDegree == "METRIC") Color.White.copy(
                     0.5f
                 ) else Color.White
             ),

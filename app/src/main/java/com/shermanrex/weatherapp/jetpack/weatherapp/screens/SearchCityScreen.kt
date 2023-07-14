@@ -1,4 +1,4 @@
-package com.shermanrex.weatherapp.jetpack.weatherapp.screen.main
+package com.shermanrex.weatherapp.jetpack.weatherapp.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -45,12 +45,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.SearchCityApiModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.navigation.NavControllerModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.util.LottieLoader
 import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.SearchViewModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.WeatherViewModel
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -100,8 +100,7 @@ fun SearchCityScreen(
                         }) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "",
-                                // tint = Color.White
+                                contentDescription = ""
                             )
                         }
                     })
@@ -113,8 +112,7 @@ fun SearchCityScreen(
                         if (textFieldChangeValue.isNotEmpty()) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "",
-                                //   tint = Color.White
+                                contentDescription = ""
                             )
                         }
                     }
@@ -170,7 +168,6 @@ fun SearchCityScreen(
 
             when (stateSearchCityApi) {
                 is ResponseResultModel.SearchSuccess -> {
-                    isplayingLottie = false
                     LazyColumn {
                         itemsIndexed(stateSearchCityApi.data) { index, item ->
                             ListItem(
@@ -208,6 +205,7 @@ fun SearchCityScreen(
                             )
                         }
                     }
+                    isplayingLottie = false
                 }
 
                 is ResponseResultModel.Loading -> {
@@ -225,15 +223,15 @@ fun SearchCityScreen(
                                         fontWeight = FontWeight.SemiBold
                                     )
                                 }, colors = ListItemDefaults.colors(
-                                    overlineColor = Color.Black,
+                                    overlineColor = Color.White,
                                     containerColor = Color.Transparent
-                                ))
+                                )
+                            )
                         }
                     }
                 }
 
                 else -> {}
-
             }
 
         }

@@ -165,8 +165,9 @@ private fun BottomSheetLayout(ForecastData: ForecastData) {
                 in 8..10 -> "Extra protection is needed"
                 else -> "very harmful"
             }
+
             val chanceofrain: String = when (ForecastData.precip.roundToInt()) {
-                in 0..20 -> "No chance for rain"
+                in 0..20 -> "low chance for rain"
                 in 30..50 -> "maybe you should expected rain"
                 in 80..100 -> "You should expected rain"
                 else -> {

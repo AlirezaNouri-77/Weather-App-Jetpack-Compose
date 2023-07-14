@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Build
 import androidx.core.content.ContextCompat
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.LocationCoordinator
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.LocationCoordinatorModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -15,6 +15,7 @@ class LocationUtil @Inject constructor(
 ) {
 
     private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
 
     fun checkLocation():Boolean {
         val resultLocation : Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -32,8 +33,8 @@ class LocationUtil @Inject constructor(
         return resultLocation
     }
 
-    fun getLocationCoordinator(): MutableList<LocationCoordinator> {
-        val list:MutableList<LocationCoordinator> = mutableListOf()
+    fun getLocationCoordinator(): MutableList<LocationCoordinatorModel> {
+        val list:MutableList<LocationCoordinatorModel> = mutableListOf()
         list.clear()
         val test = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
             ContextCompat.checkSelfPermission(context,Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -44,7 +45,7 @@ class LocationUtil @Inject constructor(
         if (test==PackageManager.PERMISSION_GRANTED){
             val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
             list.add(
-                LocationCoordinator(
+                LocationCoordinatorModel(
                     lon = location?.longitude,
                     lat = location?.latitude
                 )
