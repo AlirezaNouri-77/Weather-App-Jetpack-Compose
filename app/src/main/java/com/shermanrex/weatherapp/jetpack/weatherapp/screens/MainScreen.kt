@@ -39,16 +39,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.shermanrex.weatherapp.jetpack.weatherapp.R
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.CurrentWeatherModel
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.SevenDayForecastModel
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.ThreeHourWeatherModel
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.WeatherResponseMapKey
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.SealedResponseResultModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.navigation.NavControllerModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent.CollapseTopBar
 import com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent.CurrentWeather
 import com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent.CurrentWeatherDetial
 import com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent.SevenDayForecast
+import com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent.Shimmerloading
 import com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent.ThreehourForccast
 import com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent.TopAppBar
 import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.WeatherViewModel
@@ -89,9 +86,9 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
     if (showPermission) {
         RequestLocationPermission(
             ongranted = { weatherViewModel.callWeatherRepository() },
-            notgranted = { navController.navigate(NavControllerModel.SearchCityScreen.Route) },
+            notgranted = { navController.navigate(NavControllerModel.SearchCityScreen.route) },
             ispermissionShowed = alreadyShowedPermission,
-            PermissionShowed = { alreadyShowedPermission = true },
+            permissionShowed = { alreadyShowedPermission = true },
         )
     }
 
@@ -117,16 +114,15 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
                         if (weatherViewModel.checkLocationGranted()) {
                             showPermission = true
                         } else {
-                            weatherViewModel.updateWeatherResponseError(ResponseResultModel.Location)
+                            weatherViewModel.updateWeatherResponseError(SealedResponseResultModel.Location)
                         }
                     }, clickSearchIcon = {
-                        navController.navigate(NavControllerModel.SearchCityScreen.Route)
+                        navController.navigate(NavControllerModel.SearchCityScreen.route)
                     })
             }
         },
         modifier = Modifier.fillMaxSize()
     ) {
-
         Box(
             Modifier
                 .background(
@@ -140,25 +136,23 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
                 .padding(it)
                 .fillMaxSize()
         ) {
+            //  AnimatedContent(targetState = response, label = "") { targetstate ->
 
             when (response) {
-                is ResponseResultModel.Loading -> {
+                SealedResponseResultModel.Loading -> {
                     Shimmerloading()
                 }
 
-                is ResponseResultModel.Success -> {
+                is SealedResponseResultModel.Success -> {
 
                     isApiResponseNotEmpty = true
 
-                    val currentResponseData: CurrentWeatherModel =
-                        response.data[WeatherResponseMapKey.CurrentForecast.toString()] as CurrentWeatherModel
-                    val threeHourResponseData: ThreeHourWeatherModel =
-                        response.data[WeatherResponseMapKey.ThreeHourforcast.toString()] as ThreeHourWeatherModel
-                    val sevenDayResponseData: SevenDayForecastModel =
-                        response.data[WeatherResponseMapKey.Sevendayforecast.toString()] as SevenDayForecastModel
+//                    val currentResponseData = response.data.currentWeatherData
+//                    val threeHourResponseData = response.data.threeHourWeatherData
+//                    val sevenDayResponseData = response.data.sevenDayWeatherData
 
-                    cityName = currentResponseData.name
-                    cityTemp = currentResponseData.main.temp.roundToInt().toString()
+                    cityName = response.data.currentWeatherData.name
+                    cityTemp = response.data.currentWeatherData.main.temp.roundToInt().toString()
 
                     LazyColumn(
                         Modifier
@@ -169,7 +163,7 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
                     ) {
                         item {
                             CurrentWeather(
-                                currentResponseData,
+                                response.data.currentWeatherData,
                                 weatherViewModel.getWeatherUnitDataStore(),
                                 onClickDegree = { unit ->
                                     weatherViewModel.updateUnitDataStore(unit)
@@ -183,26 +177,28 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
                             )
                         }
                         item {
-                            ThreehourForccast(data = threeHourResponseData)
+                            ThreehourForccast(data = response.data.threeHourWeatherData)
                         }
                         item {
-                            SevenDayForecast(data = sevenDayResponseData)
+                            SevenDayForecast(data = response.data.sevenDayWeatherData)
                         }
                         item {
-                            CurrentWeatherDetial(data = currentResponseData)
+                            CurrentWeatherDetial(data = response.data.currentWeatherData)
                         }
                     }
                 }
 
-                is ResponseResultModel.Empty -> {
+                SealedResponseResultModel.Empty -> {
                     showPermission = true
                 }
 
                 else -> {}
+
             }
 
+
             when (responseerror) {
-                is ResponseResultModel.NetWork -> {
+                is SealedResponseResultModel.NetWork -> {
                     DialogScreen(
                         dialogImage = R.drawable.icon_nowifi,
                         dialogMessage = "Please check your internet connection and Try again"
@@ -214,7 +210,7 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
                         if (isApiResponseNotEmpty) {
                             Button(onClick = {
                                 weatherViewModel.updateWeatherResponseError(
-                                    ResponseResultModel.Idle
+                                    SealedResponseResultModel.Idle
                                 )
                             }) {
                                 Text(text = "close")
@@ -223,7 +219,7 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
                     }
                 }
 
-                is ResponseResultModel.Error -> {
+                is SealedResponseResultModel.Error -> {
                     DialogScreen(
                         dialogImage = R.drawable.icon_warning,
                         dialogMessage = "something goes wrong, please check your internet connection also it could be slow connection if that not maybe servers are down. Try again next time."
@@ -235,7 +231,7 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
                         if (isApiResponseNotEmpty) {
                             Button(onClick = {
                                 weatherViewModel.updateWeatherResponseError(
-                                    ResponseResultModel.Idle
+                                    SealedResponseResultModel.Idle
                                 )
                             }) {
                                 Text(text = "close")
@@ -244,7 +240,7 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
                     }
                 }
 
-                is ResponseResultModel.LocationNotOn -> {
+                is SealedResponseResultModel.LocationNotOn -> {
                     DialogScreen(
                         dialogImage = R.drawable.icon_warning,
                         dialogMessage = "Location service turned off on your device. Please turn it on and try Again."
@@ -256,7 +252,7 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
                         if (isApiResponseNotEmpty) {
                             Button(onClick = {
                                 weatherViewModel.updateWeatherResponseError(
-                                    ResponseResultModel.Idle
+                                    SealedResponseResultModel.Idle
                                 )
                             }) {
                                 Text(text = "close")
@@ -265,7 +261,7 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
                     }
                 }
 
-                is ResponseResultModel.Location -> {
+                is SealedResponseResultModel.Location -> {
                     DialogScreen(
                         dialogImage = R.drawable.icon_warning,
                         dialogMessage = "Location permission not granted for this app, Please grant that for use location service."
@@ -287,7 +283,7 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
                         if (isApiResponseNotEmpty) {
                             Button(onClick = {
                                 weatherViewModel.updateWeatherResponseError(
-                                    ResponseResultModel.Idle
+                                    SealedResponseResultModel.Idle
                                 )
                             }) {
                                 Text(text = "close")
@@ -308,7 +304,7 @@ fun RequestLocationPermission(
     ongranted: () -> Unit,
     notgranted: () -> Unit,
     ispermissionShowed: Boolean,
-    PermissionShowed: () -> Unit
+    permissionShowed: () -> Unit
 ) {
     val permissionstate =
         rememberLauncherForActivityResult(
@@ -323,7 +319,7 @@ fun RequestLocationPermission(
         )
     if (!ispermissionShowed) {
         SideEffect {
-            PermissionShowed.invoke()
+            permissionShowed.invoke()
             permissionstate.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
         }
     }

@@ -1,4 +1,4 @@
-package com.shermanrex.weatherapp.jetpack.weatherapp.screens
+package com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

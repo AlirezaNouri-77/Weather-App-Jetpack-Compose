@@ -102,7 +102,7 @@ fun ChartBottomSheet(
                 modifier = Modifier.padding(bottom = 15.dp)
             )
 
-            AnimatedContent(targetState = weatherChartEnum.value) { item ->
+            AnimatedContent(targetState = weatherChartEnum.value, label = "") { item ->
                 when (item) {
                     WeatherChartEnum.AverageTemp -> {
                         WeatherChart(

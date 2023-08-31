@@ -7,7 +7,7 @@ data class SearchModelItem(
     var lat: String ,
     var lon: String ,
     var country: String ,
-    var state: String? ,
+    var state: String ,
     var local_names: local_names
 )
 

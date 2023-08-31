@@ -44,8 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.SearchCityApiModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.SealedResponseResultModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.navigation.NavControllerModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.util.LottieLoader
 import com.shermanrex.weatherapp.jetpack.weatherapp.viewModel.SearchViewModel
@@ -96,7 +95,7 @@ fun SearchCityScreen(
                 leadingIcon = {
                     Row(content = {
                         IconButton(onClick = {
-                            navController.navigate(NavControllerModel.MainApp.Route)
+                            navController.navigate(NavControllerModel.MainApp.route)
                         }) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
@@ -167,7 +166,7 @@ fun SearchCityScreen(
             }
 
             when (stateSearchCityApi) {
-                is ResponseResultModel.SearchSuccess -> {
+                is SealedResponseResultModel.SearchSuccess -> {
                     LazyColumn {
                         itemsIndexed(stateSearchCityApi.data) { index, item ->
                             ListItem(
@@ -196,7 +195,7 @@ fun SearchCityScreen(
                                         stateSearchCityApi.data[index].lat.toDouble(),
                                         stateSearchCityApi.data[index].lon.toDouble(),
                                     )
-                                    navController.navigate(NavControllerModel.MainApp.Route)
+                                    navController.navigate(NavControllerModel.MainApp.route)
                                 },
                                 colors = ListItemDefaults.colors(
                                     overlineColor = Color.Black,
@@ -208,11 +207,11 @@ fun SearchCityScreen(
                     isplayingLottie = false
                 }
 
-                is ResponseResultModel.Loading -> {
+                is SealedResponseResultModel.Loading -> {
                     isplayingLottie = true
                 }
 
-                is ResponseResultModel.Error -> {
+                is SealedResponseResultModel.Error -> {
                     isplayingLottie = false
                     LazyColumn {
                         item {

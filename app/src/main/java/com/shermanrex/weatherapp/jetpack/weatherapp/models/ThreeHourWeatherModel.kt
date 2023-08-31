@@ -54,7 +54,7 @@ data class Main(
 )
 
 data class Rain(
-    val `3h`: Double
+    val threeHour: Double
 )
 
 data class Sys(

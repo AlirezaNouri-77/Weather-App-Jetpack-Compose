@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.SealedResponseResultModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.ThreeHourWeatherModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.datalist
 import com.shermanrex.weatherapp.jetpack.weatherapp.util.WeatherIconFinder

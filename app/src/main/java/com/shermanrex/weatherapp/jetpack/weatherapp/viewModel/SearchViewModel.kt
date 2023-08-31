@@ -1,7 +1,7 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.viewModel
 
 import androidx.lifecycle.ViewModel
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.SealedResponseResultModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.repository.SearchCityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +16,7 @@ class SearchViewModel @Inject constructor(
         searchCityRepository.getSearchCityApiRepo(cityname)
     }
 
-    fun searchCityApiResponse(): StateFlow<ResponseResultModel> {
+    fun searchCityApiResponse(): StateFlow<SealedResponseResultModel> {
         return searchCityRepository.searchApiResultStateflow
     }
 

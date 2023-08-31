@@ -2,7 +2,7 @@ package com.shermanrex.weatherapp.jetpack.weatherapp.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.SealedResponseResultModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.repository.WeatherRepository
 import com.shermanrex.weatherapp.jetpack.weatherapp.util.LocationUtil
 import com.shermanrex.weatherapp.jetpack.weatherapp.datastore.MyDataStore
@@ -48,26 +48,26 @@ class WeatherViewModel @Inject constructor(
                         )
                     }
                 } else {
-                    WeatherRepository._WeatherReponseError.value = ResponseResultModel.LocationNotOn
+                    WeatherRepository._WeatherReponseError.value = SealedResponseResultModel.LocationNotOn
                 }
                 // if above two statements is not ture which mean user before call and coordinator save in datastore
             } else if (dataStore.lat != 0.0) {
                 WeatherRepository.callWeatherApi(dataStore.lat, dataStore.lon, myDataStore.getUnitDataStore)
                 // When app launch First Time
             } else if (!LocationUtil.isPermissionGranted()) {
-               WeatherRepository._WeatherReponse.value = ResponseResultModel.Empty
+               WeatherRepository._WeatherReponse.value = SealedResponseResultModel.Empty
             }
         }
 
-    fun weatherApiResponse(): StateFlow<ResponseResultModel> {
+    fun weatherApiResponse(): StateFlow<SealedResponseResultModel> {
         return WeatherRepository.WeatherResponse
     }
 
-    fun updateWeatherResponseError(input:ResponseResultModel){
+    fun updateWeatherResponseError(input:SealedResponseResultModel){
         WeatherRepository._WeatherReponseError.value = input
     }
 
-    fun weatherApiResponseError(): StateFlow<ResponseResultModel> {
+    fun weatherApiResponseError(): StateFlow<SealedResponseResultModel> {
         return WeatherRepository.WeatherResponseError
     }
 

@@ -1,9 +1,8 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.repository
 
 import android.content.Context
-import android.util.Log
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.SearchCityApiModel
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.ResponseResultModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.SealedResponseResultModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.retrofit.RetrofitService
 import com.shermanrex.weatherapp.jetpack.weatherapp.util.ConnectivityMonitor
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -21,28 +20,28 @@ class SearchCityRepository @Inject constructor(
     private var context: Context
 ) {
 
-    val networkConnection by lazy {
+    private val networkConnection by lazy {
         ConnectivityMonitor(context = context)
     }
 
 
     private var _SearchApiResultStateflow =
-        MutableStateFlow<ResponseResultModel>(ResponseResultModel.Idle)
-    var searchApiResultStateflow: StateFlow<ResponseResultModel> = _SearchApiResultStateflow
+        MutableStateFlow<SealedResponseResultModel>(SealedResponseResultModel.Idle)
+    var searchApiResultStateflow: StateFlow<SealedResponseResultModel> = _SearchApiResultStateflow
 
     var coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
-        _SearchApiResultStateflow.value = ResponseResultModel.Error(throwable.message.toString())
+        _SearchApiResultStateflow.value = SealedResponseResultModel.Error(throwable.message.toString())
     }
 
     fun getSearchCityApiRepo(cityname: String) = CoroutineScope(Dispatchers.IO + coroutineExceptionHandler).launch {
 
         if (!networkConnection.checkNetworkConnection()) {
             _SearchApiResultStateflow.value =
-                ResponseResultModel.Error("Please check your internet connection")
+                SealedResponseResultModel.Error("Please check your internet connection")
             return@launch
         }
 
-        _SearchApiResultStateflow.value = ResponseResultModel.Loading
+        _SearchApiResultStateflow.value = SealedResponseResultModel.Loading
 
         val response = retrofit.getSearchApi(
             cityName = cityname
@@ -52,16 +51,16 @@ class SearchCityRepository @Inject constructor(
                 response.isSuccessful -> {
                     if (response.body()!!.isNotEmpty()){
                         _SearchApiResultStateflow.value =
-                            ResponseResultModel.SearchSuccess(response.body() as SearchCityApiModel)
+                            SealedResponseResultModel.SearchSuccess(response.body() as SearchCityApiModel)
                     } else {
                         _SearchApiResultStateflow.value =
-                            ResponseResultModel.Error("Nothing Found! Please try again")
+                            SealedResponseResultModel.Error("Nothing Found! Please try again")
                     }
                 }
 
                 !response.isSuccessful -> {
                     _SearchApiResultStateflow.value =
-                        ResponseResultModel.Error(response.message())
+                        SealedResponseResultModel.Error(response.message())
                 }
             }
         }
