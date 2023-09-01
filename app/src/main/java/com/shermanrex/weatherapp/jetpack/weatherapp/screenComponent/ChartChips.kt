@@ -1,5 +1,7 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.screenComponent
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -54,7 +56,9 @@ fun ChartChips(
         verticalArrangement = Arrangement.Center,
         horizontalItemSpacing = 5.dp,
         contentPadding = PaddingValues(5.dp),
-        modifier = Modifier.height(100.dp).fillMaxWidth()
+        modifier = Modifier
+            .height(100.dp)
+            .fillMaxWidth()
     ) {
 
         itemsIndexed(chartList) { index, item ->
@@ -78,14 +82,19 @@ fun ChartChipsItem(
     index: Int,
     isCheckIndex: Int
 ) {
-
+    val buttonColor =
+        animateColorAsState(
+            targetValue = if (isCheckIndex == index) Color(0xFF004e92) else Color.Transparent,
+            label = "",
+            animationSpec = tween(500),
+        ).value
     Button(
         onClick = { onClickButton.invoke() },
         shape = RoundedCornerShape(15.dp),
         modifier = Modifier.padding(5.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.5f)),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isCheckIndex == index) Color(0xFF004e92) else Color.Transparent,
+            containerColor = buttonColor,
         )
     ) {
         Text(

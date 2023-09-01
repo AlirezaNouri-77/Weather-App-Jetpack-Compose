@@ -147,10 +147,6 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
 
                     isApiResponseNotEmpty = true
 
-//                    val currentResponseData = response.data.currentWeatherData
-//                    val threeHourResponseData = response.data.threeHourWeatherData
-//                    val sevenDayResponseData = response.data.sevenDayWeatherData
-
                     cityName = response.data.currentWeatherData.name
                     cityTemp = response.data.currentWeatherData.main.temp.roundToInt().toString()
 
