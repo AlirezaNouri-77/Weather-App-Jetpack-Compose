@@ -13,36 +13,36 @@ interface RetrofitService {
 
     @GET("direct?")
     suspend fun getSearchApi(
-        @Query("limit") limit:Int = 10,
-        @Query("q") cityName:String,
-        @Query("appid") Apikey:String = Constant.OPENWEATHER_API_KEY,
+        @Query("limit") limit: Int = 10,
+        @Query("q") cityName: String,
+        @Query("appid") Apikey: String = Constant.OPENWEATHER_API_KEY,
 
         ): Response<SearchCityApiModel>
 
     @GET("weather?")
     suspend fun getCurrentWeatherApi(
-        @Query("lat") lat:Double,
-        @Query("lon") lon:Double,
-        @Query("units") units:String,
-        @Query("appid") key:String = Constant.OPENWEATHER_API_KEY,
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("units") units: String,
+        @Query("appid") key: String = Constant.OPENWEATHER_API_KEY,
 
-        ):Response<CurrentWeatherModel>
+        ): Response<CurrentWeatherModel>
 
     @GET("forecast/daily?")
     suspend fun getSevenDayWeatherApi(
-        @Query("lat") lat:Double,
-        @Query("lon") lon:Double,
-        @Query("units") units:String,
-        @Query("key") key:String = Constant.WEATHERBIT_API_KEY,
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("units") units: String,
+        @Query("key") key: String = Constant.WEATHERBIT_API_KEY,
 
-        ):Response<SevenDayForecastModel>
+        ): Response<SevenDayForecastModel>
 
     @GET("forecast?")
     suspend fun getThreeHourWeatherApi(
-        @Query("lat") lat:Double,
-        @Query("lon") lon:Double,
-        @Query("units") units:String,
-        @Query("appid") Apikey:String = Constant.OPENWEATHER_API_KEY,
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("units") units: String,
+        @Query("appid") Apikey: String = Constant.OPENWEATHER_API_KEY,
 
         ): Response<ThreeHourWeatherModel>
 

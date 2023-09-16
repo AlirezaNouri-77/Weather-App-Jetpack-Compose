@@ -13,10 +13,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
@@ -25,32 +28,32 @@ fun Modifier.shimmerffect(): Modifier = composed {
     var size by remember {
         mutableStateOf(IntSize.Zero)
     }
-    val trasition = rememberInfiniteTransition()
+    val trasition = rememberInfiniteTransition(label = "trasitionShimmer")
     val startoffsetx by trasition.animateFloat(
-        initialValue = -2 * size.width.toFloat() ,
-        targetValue = 3 * size.width.toFloat() ,
-        animationSpec = InfiniteRepeatableSpec(tween(1500))
+        initialValue = -2 * size.width.toFloat(),
+        targetValue = 3 * size.width.toFloat(),
+        animationSpec = InfiniteRepeatableSpec(tween(durationMillis = 1000 , delayMillis = 100)), label = ""
     )
-
-    background(
-        brush = Brush.linearGradient(
-            colors = if (isSystemInDarkTheme()) {
-                listOf(
-                    Color.Black.copy(0.6f) ,
-                    Color.White.copy(0.5f) ,
-                    Color.Black.copy(0.6f),
-                )
-            } else {
-                listOf(
-                    Color.LightGray.copy(0.5f) ,
-                    Color.DarkGray.copy(0.5f) ,
-                    Color.LightGray.copy(0.5f),
-                )
-            } ,
-            start = Offset(startoffsetx , 0f) ,
-            end = Offset(startoffsetx + size.width.toFloat() , size.height.toFloat())
-        ),
-        shape = RoundedCornerShape(15.dp)
-    ).onGloballyPositioned { size = it.size }
+    
+        background(
+            brush = Brush . linearGradient (
+                colors = if (isSystemInDarkTheme()) {
+                    listOf(
+                        Color.Black.copy(0.6f),
+                        Color.White.copy(0.5f),
+                        Color.Black.copy(0.6f),
+                    )
+                } else {
+                    listOf(
+                        Color.LightGray.copy(0.5f),
+                        Color.DarkGray.copy(0.5f),
+                        Color.LightGray.copy(0.5f),
+                    )
+                },
+                start = Offset(startoffsetx, 0f),
+                end = Offset(startoffsetx + size.width.toFloat(), size.height.toFloat())
+            ),
+            shape = RoundedCornerShape(15.dp)
+        ).onGloballyPositioned { size = it.size }
 
 }

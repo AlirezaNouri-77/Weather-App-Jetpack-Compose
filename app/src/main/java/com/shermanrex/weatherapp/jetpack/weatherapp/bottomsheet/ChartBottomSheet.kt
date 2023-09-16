@@ -47,7 +47,7 @@ fun ChartBottomSheet(
     ForecastData: List<ForecastData>,
 ) {
 
-    var colorAlpha = 0.9f
+    val colorAlpha = 0.9f
 
     val weatherChartEnum = remember {
         mutableStateOf(WeatherChartEnum.AverageTemp)

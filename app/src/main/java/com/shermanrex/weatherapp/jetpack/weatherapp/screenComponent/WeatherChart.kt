@@ -23,9 +23,11 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shermanrex.weatherapp.jetpack.weatherapp.models.WeatherChartModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.ui.theme.WeatherAppTheme
 import com.shermanrex.weatherapp.jetpack.weatherapp.util.timeStampFormatter
 import kotlin.math.roundToInt
 
@@ -46,7 +48,7 @@ fun WeatherChart(
     }
 
     LaunchedEffect(key1 = datalist, block = {
-        animateState.animateTo(1f, animationSpec = tween(2000 , 60) )
+        animateState.animateTo(1f, animationSpec = tween(2000, 60))
     })
 
     val inputList: MutableList<WeatherChartModel> = datalist as MutableList<WeatherChartModel>
@@ -155,3 +157,4 @@ fun WeatherChart(
         }
     }
 }
+

@@ -3,9 +3,12 @@ package com.shermanrex.weatherapp.jetpack.weatherapp.screens
 import android.Manifest
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -34,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -62,6 +66,9 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
     val responseerror =
         weatherViewModel.weatherApiResponseError().collectAsStateWithLifecycle().value
 
+
+    Log.d("TAG1", "response: "  + response)
+
     var cityName = ""
     var cityTemp = ""
 
@@ -70,6 +77,16 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
     var alreadyShowedPermission by rememberSaveable {
         mutableStateOf(false)
     }
+
+    var show by remember {
+        mutableStateOf(false)
+    }
+
+    val myalpha = animateFloatAsState(
+        targetValue = if (show) 1.0f else 0.4f,
+        label = "",
+        animationSpec = tween(300, delayMillis = 10)
+    )
 
     val iscollapse: Boolean by remember {
         derivedStateOf { listState.firstVisibleItemIndex > 0 }
@@ -136,14 +153,16 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
                 .padding(it)
                 .fillMaxSize()
         ) {
-            //  AnimatedContent(targetState = response, label = "") { targetstate ->
 
             when (response) {
                 SealedResponseResultModel.Loading -> {
+                    show = false
                     Shimmerloading()
                 }
 
                 is SealedResponseResultModel.Success -> {
+
+                    show = true
 
                     isApiResponseNotEmpty = true
 
@@ -152,7 +171,10 @@ fun WeatherScreen(navController: NavController, weatherViewModel: WeatherViewMod
 
                     LazyColumn(
                         Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .graphicsLayer {
+                                alpha = myalpha.value
+                            },
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
                         state = listState

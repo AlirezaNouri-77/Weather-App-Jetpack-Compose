@@ -24,7 +24,6 @@ class SearchCityRepository @Inject constructor(
         ConnectivityMonitor(context = context)
     }
 
-
     private var _SearchApiResultStateflow =
         MutableStateFlow<SealedResponseResultModel>(SealedResponseResultModel.Idle)
     var searchApiResultStateflow: StateFlow<SealedResponseResultModel> = _SearchApiResultStateflow
@@ -46,6 +45,7 @@ class SearchCityRepository @Inject constructor(
         val response = retrofit.getSearchApi(
             cityName = cityname
         )
+
         withContext(Dispatchers.IO) {
             when {
                 response.isSuccessful -> {
