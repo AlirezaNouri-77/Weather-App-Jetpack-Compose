@@ -1,95 +1,97 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.viewModel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.SealedResponseResultModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.datastore.DataStoreManager
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.remote.ResponseModel
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.remote.WeatherResponseData
 import com.shermanrex.weatherapp.jetpack.weatherapp.repository.WeatherRepository
-import com.shermanrex.weatherapp.jetpack.weatherapp.util.LocationUtil
-import com.shermanrex.weatherapp.jetpack.weatherapp.datastore.MyDataStore
+import com.shermanrex.weatherapp.jetpack.weatherapp.util.LocationManager
+import com.shermanrex.weatherapp.jetpack.weatherapp.util.NetworkConnectivity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
+  private var weatherRepository: WeatherRepository,
+  private var dataStoreManager: DataStoreManager,
+  private var locationManager: LocationManager,
+  private var networkConnectivity: NetworkConnectivity,
+) : ViewModel() {
+  
+  var weatherData = mutableStateOf(WeatherResponseData())
+  
+  private var _weatherResponseState = MutableStateFlow<ResponseModel>(ResponseModel.Idle)
+  val weatherResponse: StateFlow<ResponseModel> = _weatherResponseState
+  
+  init {
+	getWeather()
+  }
 
-    private var WeatherRepository: WeatherRepository,
-    private var myDataStore: MyDataStore,
-    private var LocationUtil: LocationUtil
-
-    ) : ViewModel() {
-
-
-    fun callWeatherRepositorySearchScreen(lat: Double = 0.0, lon: Double = 0.0) {
-        viewModelScope.launch {
-            WeatherRepository.callWeatherApi(
-                lat,
-                lon,
-                myDataStore.getUnitDataStore
-            )
-        }
-    }
-
-    fun callWeatherRepository() = viewModelScope.launch {
-
-           val dataStore = myDataStore.dataStoreFlow().stateIn(viewModelScope).value
-
-           if (LocationUtil.isPermissionGranted()) {
-                if (LocationUtil.checkLocation()) {
-                    withContext(Dispatchers.Default) {
-                        WeatherRepository.callWeatherApi(
-                            LocationUtil.getLocationCoordinator().first().lat!!,
-                            LocationUtil.getLocationCoordinator().first().lon!!,
-                            myDataStore.getUnitDataStore
-                        )
-                    }
-                } else {
-                    WeatherRepository._WeatherReponseError.value = SealedResponseResultModel.LocationNotOn
-                }
-                // if above two statements is not ture which mean user before call and coordinator save in datastore
-            } else if (dataStore.lat != 0.0) {
-                WeatherRepository.callWeatherApi(dataStore.lat, dataStore.lon, myDataStore.getUnitDataStore)
-                // When app launch First Time
-            } else if (!LocationUtil.isPermissionGranted()) {
-               WeatherRepository._WeatherReponse.value = SealedResponseResultModel.Empty
-            }
-        }
-
-    fun weatherApiResponse(): StateFlow<SealedResponseResultModel> {
-        return WeatherRepository.WeatherResponse
-    }
-
-    fun updateWeatherResponseError(input:SealedResponseResultModel){
-        WeatherRepository._WeatherReponseError.value = input
-    }
-
-    fun weatherApiResponseError(): StateFlow<SealedResponseResultModel> {
-        return WeatherRepository.WeatherResponseError
-    }
-
-    fun updateCoordinatorDataStore(lat: Double = 0.0, lon: Double = 0.0) =
-        viewModelScope.launch {
-            myDataStore.writeCoordinatorDataStore(lat, lon)
-        }
-
-    fun updateUnitDataStore(unit: String) = viewModelScope.launch {
-        myDataStore.writeUnitDataStore(unit)
-    }
-
-    fun getWeatherUnitDataStore(): String {
-        return myDataStore.getUnitDataStore
-    }
-
-    fun checkLocationGranted():Boolean{
-        return LocationUtil.isPermissionGranted()
-    }
-
+  fun getWeatherByCoordinator() =
+	viewModelScope.launch {
+	  if (!networkConnectivity.checkNetworkConnection()) {
+		_weatherResponseState.value = ResponseModel.UnAvailableNetwork
+	  }
+	  val coordinator = async { dataStoreManager.getCoordinator() }.await()
+	  weatherRepository.callWeatherRepository(
+		lat = coordinator.lat,
+		lon = coordinator.lon,
+		unit = coordinator.unit,
+	  ).collect {
+		_weatherResponseState.value = it
+	  }
+	}
+  
+  fun getWeather() = viewModelScope.launch {
+	if (!networkConnectivity.checkNetworkConnection()) {
+	  _weatherResponseState.value = ResponseModel.UnAvailableNetwork
+	  return@launch
+	} else {
+	  if (locationManager.isLocationPermissionGranted()) {
+		if (locationManager.checkGpsOn()) {
+		  weatherRepository.callWeatherRepository(
+			lat = locationManager.getLocationCoordinator().lat.toDouble(),
+			lon = locationManager.getLocationCoordinator().lon.toDouble(),
+			unit = getWeatherUnitDataStore(),
+		  ).collect {
+			_weatherResponseState.value =  it
+		  }
+		} else {
+		  _weatherResponseState.value = ResponseModel.UnAvailableGpsService
+		}
+	  } else {
+		if (dataStoreManager.checkDataStoreIsEmpty) {
+		  getWeatherByCoordinator()
+		}
+	  }
+	}
+  }
+  
+  fun messageShowed() {
+	_weatherResponseState.update { ResponseModel.Idle }
+  }
+  
+  fun updateCoordinatorDataStore(latitude: Double, longitude: Double) = viewModelScope.launch {
+	dataStoreManager.writeCoordinatorDataStore(lat = latitude, lon = longitude)
+  }
+  
+  fun updateUnitDataStore(unit: String) = viewModelScope.launch {
+	dataStoreManager.writeUnitDataStore(unit)
+  }
+  
+  fun getWeatherUnitDataStore(): String {
+	return dataStoreManager.getUnitDataStore
+  }
+  
+  fun checkDataStoreIsEmpty(): Boolean {
+	return dataStoreManager.checkDataStoreIsEmpty
+  }
+  
 }
-
-
-
-

@@ -1,69 +1,64 @@
 package com.shermanrex.weatherapp.jetpack.weatherapp.repository
 
 import android.content.Context
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.SearchCityApiModel
-import com.shermanrex.weatherapp.jetpack.weatherapp.models.SealedResponseResultModel
+import android.util.Log
+import com.shermanrex.weatherapp.jetpack.weatherapp.models.remote.ResponseModel
 import com.shermanrex.weatherapp.jetpack.weatherapp.retrofit.RetrofitService
-import com.shermanrex.weatherapp.jetpack.weatherapp.util.ConnectivityMonitor
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.shermanrex.weatherapp.jetpack.weatherapp.util.NetworkConnectivity
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.update
+import java.io.IOException
+import java.net.SocketException
 import javax.inject.Inject
 import javax.inject.Named
 
 class SearchCityRepository @Inject constructor(
-    @Named("SearchApiRetrofit") var retrofit: RetrofitService,
-    private var context: Context
+  @Named("SearchApiRetrofit") var retrofit: RetrofitService,
+  private var networkConnectivity: NetworkConnectivity,
 ) {
-
-    private val networkConnection by lazy {
-        ConnectivityMonitor(context = context)
-    }
-
-    private var _SearchApiResultStateflow =
-        MutableStateFlow<SealedResponseResultModel>(SealedResponseResultModel.Idle)
-    var searchApiResultStateflow: StateFlow<SealedResponseResultModel> = _SearchApiResultStateflow
-
-    var coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
-        _SearchApiResultStateflow.value = SealedResponseResultModel.Error(throwable.message.toString())
-    }
-
-    fun getSearchCityApiRepo(cityname: String) = CoroutineScope(Dispatchers.IO + coroutineExceptionHandler).launch {
-
-        if (!networkConnection.checkNetworkConnection()) {
-            _SearchApiResultStateflow.value =
-                SealedResponseResultModel.Error("Please check your internet connection")
-            return@launch
-        }
-
-        _SearchApiResultStateflow.value = SealedResponseResultModel.Loading
-
-        val response = retrofit.getSearchApi(
-            cityName = cityname
-        )
-
-        withContext(Dispatchers.IO) {
-            when {
-                response.isSuccessful -> {
-                    if (response.body()!!.isNotEmpty()){
-                        _SearchApiResultStateflow.value =
-                            SealedResponseResultModel.SearchSuccess(response.body() as SearchCityApiModel)
-                    } else {
-                        _SearchApiResultStateflow.value =
-                            SealedResponseResultModel.Error("Nothing Found! Please try again")
-                    }
-                }
-
-                !response.isSuccessful -> {
-                    _SearchApiResultStateflow.value =
-                        SealedResponseResultModel.Error(response.message())
-                }
-            }
-        }
-    }
+  
+  fun getSearchApi(cityName: String): Flow<ResponseModel> {
+	return channelFlow {
+	  
+	  if (!networkConnectivity.checkNetworkConnection()) {
+		send(ResponseModel.Error("Please check your internet connection"))
+	  } else {
+		send(ResponseModel.Loading)
+		try {
+		  
+		  val response = async {
+			retrofit.getSearchApi(
+			  cityName = cityName
+			)
+		  }.await()
+		  
+		  when {
+			
+			response.isSuccessful -> {
+			  if (response.body()!!.isNotEmpty()) {
+				send(ResponseModel.Success(response.body()))
+			  } else {
+				send(ResponseModel.Error("Nothing Found! Please try again"))
+			  }
+			}
+			
+			!response.isSuccessful -> {
+			  send(ResponseModel.Error(response.message()))
+			}
+			
+		  }
+		} catch (e: Exception) {
+		  send(ResponseModel.Error(e.message.toString()))
+		} catch (e: SocketException) {
+		  send(ResponseModel.Error("Connection Timeout"))
+		} catch (e: IOException) {
+		  send(ResponseModel.Error("Connection Timeout"))
+		}
+		
+	  }
+	}
+  }
 }
 
